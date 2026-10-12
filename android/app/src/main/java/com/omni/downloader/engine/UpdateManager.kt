@@ -28,7 +28,7 @@ data class AppUpdateInfo(
 
 object UpdateManager {
     private const val TAG = "UpdateManager"
-    const val CURRENT_APP_VERSION = "1.4.6"
+    const val CURRENT_APP_VERSION = "1.4.7"
     private const val GITHUB_API_URL = "https://api.github.com/repos/Aniketkumar-01/omni_downloader/releases/latest"
 
     suspend fun checkForUpdates(): Result<AppUpdateInfo> = withContext(Dispatchers.IO) {

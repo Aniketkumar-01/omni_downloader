@@ -548,10 +548,10 @@ Users can share directly from the native YouTube, Instagram, TikTok, or Twitter 
 2. Select **OmniDownloader** from the Android system share sheet.
 3. `MainActivity.kt` intercepts the `Intent.ACTION_SEND` intent, extracts the URL using regular expressions, populates the input bay, and automatically triggers metadata extraction.
 
-### 11.5 In-App Cookie Authentication & Bot Bypass
-Because Android sandboxes prevent any app from reading cookies from Chrome, Edge, or Brave:
-- **`WebViewAuthActivity.kt`**: Provides a secure in-app WebView for logging into YouTube or Instagram.
-- **Cookie Export**: Reads authenticated cookies via `CookieManager.getInstance().getCookie()` and writes them into Netscape format in the app's internal private storage (`filesDir/cookies.txt`).
+### 11.5 Native Direct Extraction & In-App Engine Updates
+To ensure seamless media downloads without requiring browser logins:
+- **Native Direct Platform Extraction**: The mobile engine uses Android client extraction profiles and customized headers for YouTube, Bilibili, Reddit, and Instagram directly.
+- **In-App yt-dlp Core Updater**: Users can update the embedded `yt-dlp` extraction core directly within the mobile app via `YoutubeDLEngine.updateYtDlpCore(context)`, ensuring rapid adaptation to upstream platform changes without needing a full APK rebuild.
 
 ---
 

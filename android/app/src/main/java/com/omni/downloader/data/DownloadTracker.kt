@@ -1,16 +1,85 @@
 package com.omni.downloader.data
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import com.omni.downloader.data.models.DownloadTaskProgress
 import com.omni.downloader.data.models.TaskStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.json.JSONArray
+import org.json.JSONObject
 
 object DownloadTracker {
+    private const val TAG = "DownloadTracker"
+    private const val PREFS_NAME = "omni_download_history"
+    private const val KEY_HISTORY = "history_json"
+
+    private var prefs: SharedPreferences? = null
+
     private val _activeTask = MutableStateFlow<DownloadTaskProgress?>(null)
     val activeTask = _activeTask.asStateFlow()
 
     private val _history = MutableStateFlow<List<DownloadTaskProgress>>(emptyList())
     val history = _history.asStateFlow()
+
+    fun init(context: Context) {
+        if (prefs == null) {
+            prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            loadHistory()
+        }
+    }
+
+    private fun loadHistory() {
+        val jsonStr = prefs?.getString(KEY_HISTORY, null) ?: return
+        try {
+            val jsonArray = JSONArray(jsonStr)
+            val list = mutableListOf<DownloadTaskProgress>()
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                val statusStr = obj.optString("status", TaskStatus.COMPLETED.name)
+                val status = try { TaskStatus.valueOf(statusStr) } catch (_: Exception) { TaskStatus.COMPLETED }
+                list.add(
+                    DownloadTaskProgress(
+                        taskId = obj.optString("taskId", ""),
+                        status = status,
+                        progressPercent = obj.optDouble("progressPercent", 100.0).toFloat(),
+                        currentTitle = obj.optString("currentTitle", ""),
+                        savedFilePath = obj.optString("savedFilePath").takeIf { it.isNotBlank() },
+                        errorMessage = obj.optString("errorMessage").takeIf { it.isNotBlank() },
+                        isAudio = obj.optBoolean("isAudio", false),
+                        mimeType = obj.optString("mimeType").takeIf { it.isNotBlank() }
+                    )
+                )
+            }
+            _history.value = list
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to load saved history: ${e.message}")
+        }
+    }
+
+    private fun saveHistory() {
+        val p = prefs ?: return
+        try {
+            val jsonArray = JSONArray()
+            for (item in _history.value.take(50)) {
+                val obj = JSONObject().apply {
+                    put("taskId", item.taskId)
+                    put("status", item.status.name)
+                    put("progressPercent", item.progressPercent.toDouble())
+                    put("currentTitle", item.currentTitle)
+                    item.savedFilePath?.let { put("savedFilePath", it) }
+                    item.errorMessage?.let { put("errorMessage", it) }
+                    put("isAudio", item.isAudio)
+                    item.mimeType?.let { put("mimeType", it) }
+                }
+                jsonArray.put(obj)
+            }
+            p.edit().putString(KEY_HISTORY, jsonArray.toString()).apply()
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to persist history: ${e.message}")
+        }
+    }
 
     fun updateProgress(task: DownloadTaskProgress) {
         _activeTask.value = task
@@ -19,14 +88,17 @@ object DownloadTracker {
             if (_activeTask.value?.taskId == task.taskId) {
                 _activeTask.value = null
             }
+            saveHistory()
         }
     }
 
     fun removeHistoryItem(taskId: String) {
         _history.value = _history.value.filter { it.taskId != taskId }
+        saveHistory()
     }
 
     fun clearAllHistory() {
         _history.value = emptyList()
+        saveHistory()
     }
 }

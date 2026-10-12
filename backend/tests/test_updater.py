@@ -45,15 +45,15 @@ def test_get_app_version():
 
 def test_check_update_endpoint_newer_version():
     mock_github_response = {
-        "tag_name": "v1.4.0",
-        "name": "OmniDownloader v1.4.0 - Performance Release",
+        "tag_name": "v2.0.0",
+        "name": "OmniDownloader v2.0.0 - Major Release",
         "body": "### Changes\n- Faster downloads\n- Updated engine",
-        "html_url": "https://github.com/Aniketkumar-01/omni_downloader/releases/tag/v1.4.0",
+        "html_url": "https://github.com/Aniketkumar-01/omni_downloader/releases/tag/v2.0.0",
         "published_at": "2026-10-06T12:00:00Z",
         "assets": [
             {
                 "name": "OmniDownloader-Setup.exe",
-                "browser_download_url": "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe",
+                "browser_download_url": "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v2.0.0/OmniDownloader-Setup.exe",
                 "size": 50123456
             }
         ]
@@ -69,9 +69,9 @@ def test_check_update_endpoint_newer_version():
         data = response.json()
         assert data["status"] == "success"
         assert data["update_available"] is True
-        assert data["latest_version"] == "1.4.0"
+        assert data["latest_version"] == "2.0.0"
         assert data["current_version"] == APP_VERSION
-        assert data["download_url"] == "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe"
+        assert data["download_url"] == "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v2.0.0/OmniDownloader-Setup.exe"
         assert data["file_size"] == 50123456
 
 def test_check_update_endpoint_already_up_to_date():

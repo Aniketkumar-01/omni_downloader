@@ -23,5 +23,17 @@ data class DownloadTaskProgress(
     val completedItems: Int = 0,
     val totalItems: Int = 1,
     val savedFilePath: String? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isAudio: Boolean = false,
+    val mimeType: String? = null
 )
+
+val DownloadTaskProgress.isAudioMedia: Boolean
+    get() = isAudio ||
+            savedFilePath?.contains("/audio", ignoreCase = true) == true ||
+            savedFilePath?.endsWith(".mp3", ignoreCase = true) == true ||
+            savedFilePath?.endsWith(".m4a", ignoreCase = true) == true ||
+            savedFilePath?.endsWith(".opus", ignoreCase = true) == true ||
+            savedFilePath?.endsWith(".flac", ignoreCase = true) == true ||
+            savedFilePath?.endsWith(".wav", ignoreCase = true) == true ||
+            mimeType?.startsWith("audio/") == true

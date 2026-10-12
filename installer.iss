@@ -5,7 +5,7 @@
 ; =====================================================================
 
 #define MyAppName "OmniDownloader"
-#define MyAppVersion "1.3.5"
+#define MyAppVersion "1.4.7"
 #define MyAppPublisher "Aniket Kumar"
 #define MyAppURL "https://github.com/Aniketkumar-01/omni_downloader"
 #define MyAppExeName "OmniDownloader.exe"

@@ -57,7 +57,10 @@ To install directly to a connected phone:
 
 - `com.omni.downloader.OmniApplication`: Initializes embedded `YoutubeDL` & `FFmpeg` engines and notification channels.
 - `com.omni.downloader.MainActivity`: Entry point, handles `ACTION_SEND` (Share Target from other apps) and Android 13+ notification permissions.
-- `com.omni.downloader.engine.YoutubeDLEngine`: Manages metadata extraction and download command options.
+- `com.omni.downloader.data.repository.MediaRepository`: Data layer isolating engine operations and network extraction.
+- `com.omni.downloader.ui.viewmodel.MainViewModel`: MVVM state holder managing UDF state flows and UI interaction events.
+- `com.omni.downloader.ui.components.*`: Modular UI components (`UrlInputCard`, `MediaPreviewCard`, `PlaylistVideosCard`, `DownloadsSheet`, `AppUpdateDialog`, `ErrorBanner`).
+- `com.omni.downloader.engine.YoutubeDLEngine`: Manages metadata extraction and accelerated download options.
 - `com.omni.downloader.engine.StorageHelper`: Handles Scoped Storage and publishes completed files into Android's `MediaStore`.
 - `com.omni.downloader.service.DownloadForegroundService`: Uninterrupted background download service with persistent notifications.
-- `com.omni.downloader.ui.screens.MainScreen`: Jetpack Compose main UI.
+- `com.omni.downloader.ui.screens.MainScreen`: Jetpack Compose main UI layout and screen coordination.

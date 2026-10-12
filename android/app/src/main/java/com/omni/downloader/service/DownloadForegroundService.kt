@@ -120,7 +120,8 @@ class DownloadForegroundService : Service() {
                         status = TaskStatus.DOWNLOADING,
                         progressPercent = 0f,
                         currentTitle = activeTitle,
-                        totalItems = if (activeIsPlaylist) 0 else 1
+                        totalItems = if (activeIsPlaylist) 0 else 1,
+                        isAudio = activeIsAudio
                     )
                 )
 
@@ -167,7 +168,8 @@ class DownloadForegroundService : Service() {
                         taskId = activeTaskId,
                         status = TaskStatus.CANCELLED,
                         currentTitle = activeTitle,
-                        errorMessage = "Cancelled by user"
+                        errorMessage = "Cancelled by user",
+                        isAudio = activeIsAudio
                     )
                 )
                 val notificationManager = getSystemService(NotificationManager::class.java)
@@ -214,7 +216,8 @@ class DownloadForegroundService : Service() {
                         speedFormatted = speed,
                         currentTitle = activeTitle,
                         completedItems = playlistCompleted,
-                        totalItems = playlistTotal
+                        totalItems = playlistTotal,
+                        isAudio = activeIsAudio
                     )
                 )
             }
@@ -247,10 +250,11 @@ class DownloadForegroundService : Service() {
                         currentTitle = activeTitle,
                         completedItems = savedCount,
                         totalItems = savedCount.coerceAtLeast(1),
-                        savedFilePath = lastSavedUri
+                        savedFilePath = lastSavedUri,
+                        isAudio = activeIsAudio
                     )
                 )
-                showCompleteNotification(activeTitle, savedCount)
+                showCompleteNotification(activeTitle, savedCount, lastSavedUri)
                 stopSelf()
             }.onFailure { error ->
                 taskTempDir.deleteRecursively()
@@ -261,7 +265,8 @@ class DownloadForegroundService : Service() {
                             taskId = activeTaskId,
                             status = TaskStatus.FAILED,
                             currentTitle = activeTitle,
-                            errorMessage = error.message ?: "Download failed"
+                            errorMessage = error.message ?: "Download failed",
+                            isAudio = activeIsAudio
                         )
                     )
                     showFailedNotification(activeTitle, error.message ?: "Download encountered an error")
@@ -329,21 +334,36 @@ class DownloadForegroundService : Service() {
         )
     }
 
-    private fun showCompleteNotification(title: String, savedCount: Int) {
+    private fun showCompleteNotification(title: String, savedCount: Int, savedUri: String? = null) {
         val notificationManager = getSystemService(NotificationManager::class.java)
         val text = if (savedCount > 1) {
             "Playlist downloaded: $savedCount videos saved to Media Library."
         } else {
             "$title saved to your media library."
         }
-        val notif = NotificationCompat.Builder(this, OmniApplication.CHANNEL_ID)
+        val builder = NotificationCompat.Builder(this, OmniApplication.CHANNEL_ID)
             .setContentTitle("Download Complete")
             .setContentText(text)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setAutoCancel(true)
             .setContentIntent(getLaunchIntent())
-            .build()
-        notificationManager?.notify(NOTIFICATION_ID + 1, notif)
+
+        val openIntent = StorageHelper.getOpenMediaIntent(this, savedUri, title, activeIsAudio)
+        if (openIntent != null) {
+            val pendingOpen = PendingIntent.getActivity(
+                this,
+                activeTaskId.hashCode(),
+                openIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            builder.addAction(
+                android.R.drawable.ic_media_play,
+                if (activeIsAudio) "Play Audio" else "Open Video",
+                pendingOpen
+            )
+        }
+
+        notificationManager?.notify(NOTIFICATION_ID + 1, builder.build())
     }
 
     private fun showFailedNotification(title: String, error: String) {

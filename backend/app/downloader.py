@@ -336,7 +336,12 @@ def get_base_ydl_opts(
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
             'Accept-Language': 'en-US,en;q=0.9',
-        }
+        },
+        'socket_timeout': 30,
+        'retries': 10,
+        'fragment_retries': 10,
+        'concurrent_fragment_downloads': 5,
+        'buffersize': 16384,
     }
 
     # 1. Determine active cookies (temp task file > user-data cookies.txt > workspace cookies.txt > browser)
@@ -359,6 +364,15 @@ def get_base_ydl_opts(
 
     return opts
 
+# Thread-safe in-memory cache for media info (prevents redundant extractions on download start)
+import time
+_MEDIA_INFO_CACHE: Dict[str, tuple[float, MediaInfoResponse]] = {}
+_CACHE_TTL_SECONDS = 300.0  # 5 minutes
+
+def clear_media_info_cache() -> None:
+    """Clears cached media metadata."""
+    _MEDIA_INFO_CACHE.clear()
+
 def extract_media_info(
     url: str, 
     cookie_browser: Optional[str] = None,
@@ -367,9 +381,22 @@ def extract_media_info(
 ) -> MediaInfoResponse:
     """
     Extracts metadata from YouTube, Instagram, TikTok, Twitter, Bilibili, and other platforms without downloading.
-    Includes automated local PC browser fallback and emergency fallback for YouTube challenges.
+    Includes automated local PC browser fallback, emergency fallback for YouTube challenges,
+    and thread-safe TTL caching to eliminate redundant network roundtrips between preview and download.
     """
-    platform = detect_platform(url)
+    clean_url = url.strip()
+    cache_key = f"{clean_url}||{cookie_browser or ''}||{str(cookie_file) if cookie_file else ''}"
+    now = time.time()
+
+    if cache_key in _MEDIA_INFO_CACHE:
+        cached_ts, cached_resp = _MEDIA_INFO_CACHE[cache_key]
+        if now - cached_ts < _CACHE_TTL_SECONDS:
+            logger.info(f"Serving cached media metadata for: {clean_url[:60]}")
+            return cached_resp.model_copy(deep=True)
+        else:
+            _MEDIA_INFO_CACHE.pop(cache_key, None)
+
+    platform = detect_platform(clean_url)
     ydl_opts = get_base_ydl_opts(platform, cookie_browser, cookie_file)
     ydl_opts['extract_flat'] = 'in_playlist'
     ydl_opts['skip_download'] = True
@@ -502,7 +529,7 @@ def extract_media_info(
                 k: f"~{format_size_bytes(v)}" for k, v in playlist_quality_sizes.items()
             }
 
-        return MediaInfoResponse(
+        response = MediaInfoResponse(
             url=url,
             is_playlist=True,
             title=playlist_title,
@@ -517,6 +544,11 @@ def extract_media_info(
             estimated_filesize=total_playlist_bytes or None,
             filesize_formatted=f"~{format_size_bytes(total_playlist_bytes)}" if total_playlist_bytes else None
         )
+        if len(_MEDIA_INFO_CACHE) >= 100:
+            oldest_key = min(_MEDIA_INFO_CACHE.keys(), key=lambda k: _MEDIA_INFO_CACHE[k][0])
+            _MEDIA_INFO_CACHE.pop(oldest_key, None)
+        _MEDIA_INFO_CACHE[cache_key] = (now, response)
+        return response
     else:
         # Single video
         duration = info.get('duration')
@@ -548,7 +580,7 @@ def extract_media_info(
             quality_sizes_formatted=quality_sizes_formatted
         )
 
-        return MediaInfoResponse(
+        response = MediaInfoResponse(
             url=url,
             is_playlist=False,
             title=title,
@@ -563,6 +595,11 @@ def extract_media_info(
             estimated_filesize=best_size,
             filesize_formatted=best_formatted
         )
+        if len(_MEDIA_INFO_CACHE) >= 100:
+            oldest_key = min(_MEDIA_INFO_CACHE.keys(), key=lambda k: _MEDIA_INFO_CACHE[k][0])
+            _MEDIA_INFO_CACHE.pop(oldest_key, None)
+        _MEDIA_INFO_CACHE[cache_key] = (now, response)
+        return response
 
 import os
 import shutil

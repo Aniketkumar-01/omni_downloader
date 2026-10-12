@@ -101,6 +101,19 @@ class TaskManager:
         return task_id in self.paused_tasks
 
     def create_task(self, request: DownloadRequest) -> str:
+        # Prune old completed/cancelled/failed tasks if tracking exceeds 200 items
+        if len(self.tasks) > 200:
+            terminal_ids = [
+                tid for tid, t in self.tasks.items() 
+                if t.status in ("completed", "failed", "cancelled")
+            ]
+            for tid in terminal_ids[:len(self.tasks) - 100]:
+                self.tasks.pop(tid, None)
+                self.subscribers.pop(tid, None)
+                self.cancelled_tasks.discard(tid)
+                self.paused_tasks.discard(tid)
+                self.last_emit_time.pop(tid, None)
+
         task_id = str(uuid.uuid4())[:8]
         effective_dir = request.download_dir.strip().strip('"\'') if request.download_dir else str(get_default_download_dir())
         status = DownloadTaskStatus(

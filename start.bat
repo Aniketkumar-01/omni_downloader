@@ -3,13 +3,6 @@ setlocal
 
 cd /d "%~dp0"
 
-:: If Windows app has been moved to windows\ subfolder, delegate to it
-if exist "windows\start.bat" if not exist "backend\app\main.py" (
-    cd windows
-    call start.bat
-    exit /b %errorlevel%
-)
-
 echo ========================================================
 echo   OmniDownloader - Windows Desktop Quick Launcher
 echo ========================================================

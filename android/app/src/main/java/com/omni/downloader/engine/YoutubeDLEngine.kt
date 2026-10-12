@@ -163,6 +163,8 @@ object YoutubeDLEngine {
                 req.addOption("--no-warnings")
                 req.addOption("--no-update")
                 req.addOption("--no-check-certificates")
+                req.addOption("--socket-timeout", "30")
+                req.addOption("--retries", "10")
                 req.addOption("--user-agent", BROWSER_USER_AGENT)
                 req.addOption("--add-header", "Accept-Language:en-US,en;q=0.9")
                 val cacheDir = File(context.cacheDir, "ytdlp_cache").apply { mkdirs() }
@@ -348,6 +350,11 @@ object YoutubeDLEngine {
                 req.addOption("--no-warnings")
                 req.addOption("--no-update")
                 req.addOption("--no-check-certificates")
+                req.addOption("--socket-timeout", "30")
+                req.addOption("--retries", "10")
+                req.addOption("--fragment-retries", "10")
+                req.addOption("--concurrent-fragments", "4")
+                req.addOption("--buffer-size", "16K")
                 req.addOption("--user-agent", BROWSER_USER_AGENT)
                 req.addOption("--add-header", "Accept-Language:en-US,en;q=0.9")
 

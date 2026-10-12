@@ -21,6 +21,7 @@ class OmniApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        com.omni.downloader.data.DownloadTracker.init(this)
         initDownloadEngines()
         createNotificationChannel()
     }
