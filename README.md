@@ -59,6 +59,12 @@ Visit the [**Latest GitHub Releases**](https://github.com/Aniketkumar-01/omni_do
 5. Click **Download**!
 6. Once finished, click **Show in Folder** to open the file directly in Windows Explorer.
 
+### 📱 Android Mobile Quick Start
+1. Visit the [**Latest GitHub Releases**](https://github.com/Aniketkumar-01/omni_downloader/releases/latest) page and download **`OmniDownloader.apk`**.
+2. Install the APK on your device (supports modern 64-bit ARM phones, Android 7.0+).
+3. Use in-app or share links directly to OmniDownloader via the Android System Share Sheet.
+4. *Tip for future updates:* When a new release is available, uninstall your existing build before installing the new APK to prevent package signature conflicts.
+
 ---
 
 ## 🛠️ FFmpeg Setup (For 1080p, 4K & MP3)

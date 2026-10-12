@@ -1,41 +1,46 @@
 package com.omni.downloader.ui.components
 
+import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omni.downloader.engine.AppUpdateInfo
 import com.omni.downloader.ui.theme.*
-import java.io.File
 
 /**
- * Reusable Dialog component for In-App APK update checking, release notes display, and installation.
+ * Dialog displaying app update availability, uninstallation notice,
+ * changelog release notes, and external browser download links.
  */
 @Composable
 fun AppUpdateDialog(
     updateInfo: AppUpdateInfo,
-    isDownloadingApk: Boolean,
-    downloadApkProgress: Int,
-    downloadApkStatus: String,
-    downloadedApkFile: File?,
     onDismiss: () -> Unit,
-    onStartDownload: () -> Unit,
-    onInstallApk: () -> Unit,
+    onOpenDownloadLink: (String) -> Unit,
     onUpdateCoreEngine: () -> Unit,
-    onOpenBrowser: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val targetDownloadUrl = updateInfo.apkDownloadUrl ?: updateInfo.releasePageUrl
+
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = SurfaceDark,
@@ -65,7 +70,47 @@ fun AppUpdateDialog(
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
+
                 if (updateInfo.isUpdateAvailable) {
+                    // Important guidance notice on uninstalling prior to update
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF281F12)),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, Color(0xFFE5A100).copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(10.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Icon(
+                                Icons.Default.WarningAmber,
+                                contentDescription = null,
+                                tint = Color(0xFFFFB74D),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text(
+                                    "Important Installation Step",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFFFB74D)
+                                )
+                                Spacer(modifier = Modifier.height(3.dp))
+                                Text(
+                                    "Please uninstall your current OmniDownloader app first before installing the new version to avoid package signature conflict errors.",
+                                    fontSize = 11.sp,
+                                    color = TextPrimary,
+                                    lineHeight = 15.sp
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     Text(
                         "What's New:",
                         fontSize = 12.sp,
@@ -78,7 +123,7 @@ fun AppUpdateDialog(
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 140.dp)
+                            .heightIn(max = 130.dp)
                     ) {
                         LazyColumn(modifier = Modifier.padding(10.dp)) {
                             item {
@@ -87,30 +132,49 @@ fun AppUpdateDialog(
                         }
                     }
 
-                    if (isDownloadingApk) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        LinearProgressIndicator(
-                            progress = if (downloadApkProgress >= 0) downloadApkProgress / 100f else 0f,
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Download Link presentation with copy button
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(RoundedCornerShape(3.dp)),
-                            color = AccentTeal,
-                            trackColor = SurfaceCard
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            downloadApkStatus,
-                            fontSize = 11.sp,
-                            color = AccentCyan
-                        )
-                    } else if (downloadedApkFile != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "✓ Update downloaded and ready to install.",
-                            fontSize = 11.sp,
-                            color = StatusSuccess
-                        )
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    "Download Link:",
+                                    fontSize = 10.sp,
+                                    color = TextSecondary,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    targetDownloadUrl,
+                                    fontSize = 11.sp,
+                                    color = AccentCyan,
+                                    maxLines = 1
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString(targetDownloadUrl))
+                                    Toast.makeText(context, "Download link copied to clipboard", Toast.LENGTH_SHORT).show()
+                                },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.ContentCopy,
+                                    contentDescription = "Copy Link",
+                                    tint = AccentTeal,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
                     }
                 } else {
                     Text(
@@ -122,41 +186,19 @@ fun AppUpdateDialog(
             }
         },
         confirmButton = {
-            if (updateInfo.isUpdateAvailable && updateInfo.apkDownloadUrl != null) {
-                if (isDownloadingApk) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = AccentTeal,
-                        strokeWidth = 2.dp
+            if (updateInfo.isUpdateAvailable) {
+                Button(
+                    onClick = { onOpenDownloadLink(targetDownloadUrl) },
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentTeal)
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.OpenInNew,
+                        contentDescription = null,
+                        tint = BgDark,
+                        modifier = Modifier.size(16.dp)
                     )
-                } else if (downloadedApkFile != null) {
-                    Button(
-                        onClick = onInstallApk,
-                        colors = ButtonDefaults.buttonColors(containerColor = AccentTeal)
-                    ) {
-                        Icon(
-                            Icons.Default.Download,
-                            contentDescription = null,
-                            tint = BgDark,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Install APK Now", color = BgDark, fontWeight = FontWeight.Bold)
-                    }
-                } else {
-                    Button(
-                        onClick = onStartDownload,
-                        colors = ButtonDefaults.buttonColors(containerColor = AccentTeal)
-                    ) {
-                        Icon(
-                            Icons.Default.Download,
-                            contentDescription = null,
-                            tint = BgDark,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Download & Install", color = BgDark, fontWeight = FontWeight.Bold)
-                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Download Update", color = BgDark, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Button(
@@ -168,20 +210,10 @@ fun AppUpdateDialog(
             }
         },
         dismissButton = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (updateInfo.isUpdateAvailable && updateInfo.apkDownloadUrl != null) {
-                    TextButton(onClick = onOpenBrowser) {
-                        Text("Browser", fontSize = 11.sp, color = TextSecondary)
-                    }
-                }
-                TextButton(onClick = {
-                    if (!isDownloadingApk) {
-                        onDismiss()
-                    }
-                }) {
-                    Text("Close", color = TextSecondary)
-                }
+            TextButton(onClick = onDismiss) {
+                Text("Close", color = TextSecondary)
             }
         }
     )
 }
+

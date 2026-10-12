@@ -222,33 +222,20 @@ fun MainScreen(
         )
     }
 
-    // In-App Update Dialog
+    // App Update Dialog
     if (uiState.showUpdateDialog && uiState.updateInfo != null) {
         AppUpdateDialog(
             updateInfo = uiState.updateInfo!!,
-            isDownloadingApk = uiState.isDownloadingApk,
-            downloadApkProgress = uiState.downloadApkProgress,
-            downloadApkStatus = uiState.downloadApkStatus,
-            downloadedApkFile = uiState.downloadedApkFile,
             onDismiss = { viewModel.setUpdateDialogVisible(false) },
-            onStartDownload = {
-                viewModel.startApkDownload(context) { errorMsg ->
-                    Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
-                }
+            onOpenDownloadLink = { url ->
+                UpdateManager.openDownloadUrl(context, url)
             },
-            onInstallApk = { viewModel.installDownloadedApk(context) },
             onUpdateCoreEngine = {
                 Toast.makeText(context, "Updating yt-dlp core...", Toast.LENGTH_SHORT).show()
                 viewModel.updateEngineCore(context) { _, msg ->
                     Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                 }
                 viewModel.setUpdateDialogVisible(false)
-            },
-            onOpenBrowser = {
-                UpdateManager.openDownloadUrl(
-                    context,
-                    "https://github.com/Aniketkumar-01/omni_downloader/releases/latest"
-                )
             }
         )
     }

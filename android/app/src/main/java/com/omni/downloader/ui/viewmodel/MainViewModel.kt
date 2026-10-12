@@ -9,13 +9,11 @@ import com.omni.downloader.data.models.DownloadTaskProgress
 import com.omni.downloader.data.repository.DefaultMediaRepository
 import com.omni.downloader.data.repository.MediaRepository
 import com.omni.downloader.engine.StorageHelper
-import com.omni.downloader.engine.UpdateManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /**
  * Main ViewModel for OmniDownloader Android.
@@ -195,61 +193,6 @@ class MainViewModel(
         }
     }
 
-    fun startApkDownload(context: Context, onErrorToast: (String) -> Unit) {
-        val apkUrl = _uiState.value.updateInfo?.apkDownloadUrl ?: return
-
-        _uiState.update {
-            it.copy(
-                isDownloadingApk = true,
-                downloadApkStatus = "Starting download...",
-                downloadApkProgress = 0
-            )
-        }
-
-        viewModelScope.launch {
-            val result = repository.downloadApk(context, apkUrl) { bytesRead, totalBytes, percent ->
-                val mbRead = bytesRead.toDouble() / (1024 * 1024)
-                val mbTotal = totalBytes.toDouble() / (1024 * 1024)
-                val statusText = if (totalBytes > 0) {
-                    String.format(Locale.US, "Downloading: %.1f / %.1f MB (%d%%)", mbRead, mbTotal, percent)
-                } else {
-                    String.format(Locale.US, "Downloading: %.1f MB", mbRead)
-                }
-                _uiState.update {
-                    it.copy(
-                        downloadApkProgress = percent,
-                        downloadApkStatus = statusText
-                    )
-                }
-            }
-
-            result.onSuccess { apkFile ->
-                _uiState.update {
-                    it.copy(
-                        isDownloadingApk = false,
-                        downloadedApkFile = apkFile,
-                        downloadApkStatus = "Download complete! Opening installer..."
-                    )
-                }
-                UpdateManager.installApk(context, apkFile)
-            }.onFailure { err ->
-                _uiState.update {
-                    it.copy(
-                        isDownloadingApk = false,
-                        downloadApkStatus = "Download failed: ${err.message}"
-                    )
-                }
-                onErrorToast("Download failed: ${err.message}")
-            }
-        }
-    }
-
-    fun installDownloadedApk(context: Context) {
-        _uiState.value.downloadedApkFile?.let { apkFile ->
-            UpdateManager.installApk(context, apkFile)
-        }
-    }
-
     fun updateEngineCore(context: Context, onResult: (isSuccess: Boolean, message: String) -> Unit) {
         viewModelScope.launch {
             val result = repository.updateEngineCore(context)
@@ -270,14 +213,6 @@ class MainViewModel(
     }
 
     fun setUpdateDialogVisible(visible: Boolean) {
-        _uiState.update {
-            it.copy(
-                showUpdateDialog = visible,
-                isDownloadingApk = if (!visible) false else it.isDownloadingApk,
-                downloadApkProgress = if (!visible) 0 else it.downloadApkProgress,
-                downloadApkStatus = if (!visible) "" else it.downloadApkStatus,
-                downloadedApkFile = if (!visible) null else it.downloadedApkFile
-            )
-        }
+        _uiState.update { it.copy(showUpdateDialog = visible) }
     }
 }

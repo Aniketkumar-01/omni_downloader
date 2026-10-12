@@ -53,6 +53,18 @@ To install directly to a connected phone:
 
 ---
 
+## 🔄 Updating to New Versions (Installation Guideline)
+
+OmniDownloader includes an update checker directly within the mobile app:
+1. Tap the **Refresh / Check Update** icon in the top app bar.
+2. If a new release is available, the app displays the version comparison, release changelog notes, and a direct link to the latest APK on GitHub Releases.
+3. ⚠️ **Important Step Before Installing Updates**:
+   - Always **uninstall the current version** of OmniDownloader from your device before installing the newly downloaded APK.
+   - **Why?** Android strictly checks cryptographic package signatures when updating apps. If the newly built APK signature differs from the previously installed build (e.g., CI/CD build keys vs. local test keys), Android rejects the update with *"App not installed as package conflicts with an existing package"*.
+   - Uninstalling the old build first guarantees a clean, conflict-free install without triggering unknown source permissions or package errors.
+
+---
+
 ## 📁 Architecture Overview
 
 - `com.omni.downloader.OmniApplication`: Initializes embedded `YoutubeDL` & `FFmpeg` engines and notification channels.
@@ -61,6 +73,7 @@ To install directly to a connected phone:
 - `com.omni.downloader.ui.viewmodel.MainViewModel`: MVVM state holder managing UDF state flows and UI interaction events.
 - `com.omni.downloader.ui.components.*`: Modular UI components (`UrlInputCard`, `MediaPreviewCard`, `PlaylistVideosCard`, `DownloadsSheet`, `AppUpdateDialog`, `ErrorBanner`).
 - `com.omni.downloader.engine.YoutubeDLEngine`: Manages metadata extraction and accelerated download options.
+- `com.omni.downloader.engine.UpdateManager`: Checks GitHub releases API and generates external browser download links.
 - `com.omni.downloader.engine.StorageHelper`: Handles Scoped Storage and publishes completed files into Android's `MediaStore`.
 - `com.omni.downloader.service.DownloadForegroundService`: Uninterrupted background download service with persistent notifications.
 - `com.omni.downloader.ui.screens.MainScreen`: Jetpack Compose main UI layout and screen coordination.

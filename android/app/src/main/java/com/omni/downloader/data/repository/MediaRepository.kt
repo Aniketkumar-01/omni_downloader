@@ -8,7 +8,6 @@ import com.omni.downloader.engine.YoutubeDLEngine
 import com.omni.downloader.service.DownloadForegroundService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 /**
  * Repository interface defining data and engine operations for OmniDownloader Android.
@@ -17,11 +16,6 @@ interface MediaRepository {
     suspend fun fetchMetadata(context: Context, url: String): Result<MediaMetadata>
     suspend fun updateEngineCore(context: Context): Result<String>
     suspend fun checkForUpdates(): Result<AppUpdateInfo>
-    suspend fun downloadApk(
-        context: Context,
-        apkUrl: String,
-        onProgress: (bytesRead: Long, totalBytes: Long, percent: Int) -> Unit
-    ): Result<File>
     fun startDownload(
         context: Context,
         url: String,
@@ -54,14 +48,6 @@ class DefaultMediaRepository : MediaRepository {
         withContext(Dispatchers.IO) {
             UpdateManager.checkForUpdates()
         }
-
-    override suspend fun downloadApk(
-        context: Context,
-        apkUrl: String,
-        onProgress: (bytesRead: Long, totalBytes: Long, percent: Int) -> Unit
-    ): Result<File> = withContext(Dispatchers.IO) {
-        UpdateManager.downloadApk(context, apkUrl, onProgress)
-    }
 
     override fun startDownload(
         context: Context,
