@@ -27,6 +27,16 @@ class OmniApplication : Application() {
 
     private fun initDownloadEngines() {
         try {
+            // Set TMPDIR / TEMP / TMP to internal app cache so Python / yt-dlp never writes to read-only root '/'
+            val tmpDir = java.io.File(cacheDir, "tmp").apply { mkdirs() }
+            try {
+                android.system.Os.setenv("TMPDIR", tmpDir.absolutePath, true)
+                android.system.Os.setenv("TEMP", tmpDir.absolutePath, true)
+                android.system.Os.setenv("TMP", tmpDir.absolutePath, true)
+            } catch (envErr: Exception) {
+                Log.w(TAG, "Failed setting TMPDIR env: ${envErr.message}")
+            }
+
             // Initialize embedded CPython & yt-dlp native libraries
             YoutubeDL.getInstance().init(this)
             Log.i(TAG, "YoutubeDL engine successfully initialized.")

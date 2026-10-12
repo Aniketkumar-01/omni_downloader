@@ -21,6 +21,14 @@ object YoutubeDLEngine {
 
     private fun ensureInitialized(context: Context) {
         try {
+            val tmpDir = File(context.cacheDir, "tmp").apply { mkdirs() }
+            try {
+                android.system.Os.setenv("TMPDIR", tmpDir.absolutePath, true)
+                android.system.Os.setenv("TEMP", tmpDir.absolutePath, true)
+                android.system.Os.setenv("TMP", tmpDir.absolutePath, true)
+            } catch (envErr: Exception) {
+                Log.w(TAG, "Env init check: ${envErr.message}")
+            }
             YoutubeDL.getInstance().init(context.applicationContext)
             com.yausername.ffmpeg.FFmpeg.getInstance().init(context.applicationContext)
         } catch (e: Exception) {
@@ -157,6 +165,8 @@ object YoutubeDLEngine {
                 req.addOption("--no-check-certificates")
                 req.addOption("--user-agent", BROWSER_USER_AGENT)
                 req.addOption("--add-header", "Accept-Language:en-US,en;q=0.9")
+                val cacheDir = File(context.cacheDir, "ytdlp_cache").apply { mkdirs() }
+                req.addOption("--cache-dir", cacheDir.absolutePath)
 
                 if (url.contains("bilibili.com", ignoreCase = true) || url.contains("b23.tv", ignoreCase = true)) {
                     req.addOption("--add-header", "Referer:https://www.bilibili.com")
@@ -229,6 +239,8 @@ object YoutubeDLEngine {
                         addOption("--no-warnings")
                         addOption("--no-check-certificates")
                         addOption("--user-agent", BROWSER_USER_AGENT)
+                        val cacheDir = File(context.cacheDir, "ytdlp_cache").apply { mkdirs() }
+                        addOption("--cache-dir", cacheDir.absolutePath)
                         addOption("--print", "%(id)s\t%(title)s")
                     }
                     val plResponse = YoutubeDL.getInstance().execute(plRequest)
@@ -319,6 +331,16 @@ object YoutubeDLEngine {
                 .filter { it.startsWith("http://") || it.startsWith("https://") }
                 .ifEmpty { listOf(url.trim()) }
 
+            targetDir.mkdirs()
+            val tmpDir = File(context.cacheDir, "tmp").apply { mkdirs() }
+            try {
+                android.system.Os.setenv("TMPDIR", tmpDir.absolutePath, true)
+                android.system.Os.setenv("TEMP", tmpDir.absolutePath, true)
+                android.system.Os.setenv("TMP", tmpDir.absolutePath, true)
+            } catch (envErr: Exception) {
+                Log.w(TAG, "Env download check: ${envErr.message}")
+            }
+
             val configureRequest: (YoutubeDLRequest, String, Boolean, Int) -> Unit = { req, targetUrl, isPl, itemIndex ->
                 req.addOption("-c") // Support resume for paused downloads
                 req.addOption("--no-mtime")
@@ -328,6 +350,12 @@ object YoutubeDLEngine {
                 req.addOption("--no-check-certificates")
                 req.addOption("--user-agent", BROWSER_USER_AGENT)
                 req.addOption("--add-header", "Accept-Language:en-US,en;q=0.9")
+
+                // Explicit writable cache and paths for Android
+                val cacheDir = File(context.cacheDir, "ytdlp_cache").apply { mkdirs() }
+                req.addOption("--cache-dir", cacheDir.absolutePath)
+                req.addOption("-P", targetDir.absolutePath)
+                req.addOption("-P", "temp:${targetDir.absolutePath}")
 
                 if (targetUrl.contains("bilibili.com", ignoreCase = true) || targetUrl.contains("b23.tv", ignoreCase = true)) {
                     req.addOption("--add-header", "Referer:https://www.bilibili.com")
