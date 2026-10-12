@@ -1608,7 +1608,7 @@ function openUpdateModal(data) {
     updateNotesContent.innerHTML = formatReleaseNotes(data.release_notes);
   }
   if (btnUpdateGithubLink) {
-    btnUpdateGithubLink.href = data.release_url || "https://github.com/Aniketkumar-01/socials_downloader/releases";
+    btnUpdateGithubLink.href = data.release_url || "https://github.com/Aniketkumar-01/omni_downloader/releases";
   }
 
   // Reset download state views if not actively running

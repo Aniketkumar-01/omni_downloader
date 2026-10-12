@@ -172,7 +172,7 @@ if str(ENGINE_DIR) not in sys.path:
 
 # Application Version and Remote Update Settings
 APP_VERSION = "1.4.0"
-GITHUB_REPO = "Aniketkumar-01/socials_downloader"
+GITHUB_REPO = "Aniketkumar-01/omni_downloader"
 UPDATES_DIR = USER_DATA_DIR / "updates"
 UPDATES_DIR.mkdir(parents=True, exist_ok=True)
 

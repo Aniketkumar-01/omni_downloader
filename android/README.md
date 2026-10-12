@@ -23,6 +23,7 @@
 
 - **Android Studio**: Jellyfish (2023.3+) or Ladybug (2024.1+)
 - **Android SDK**: Min SDK 24 (Android 7.0), Target SDK 34 (Android 14)
+- **Target Architecture**: `arm64-v8a` (Modern 64-bit ARM phones; reduces APK size from ~207 MB to ~55 MB)
 - **JDK**: Java 17+
 - **NDK**: Included automatically via `youtubedl-android`
 

@@ -143,8 +143,8 @@ jobs:
           mkdir -p dist-release
           if [ ! -f "dist-release/OmniDownloader-Setup.exe" ]; then
             echo "Fetching latest Windows release binaries from v1.4.0 to include in release assets..."
-            curl -L -f -s -o dist-release/OmniDownloader-Setup.exe "https://github.com/Aniketkumar-01/socials_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe" || true
-            curl -L -f -s -o dist-release/OmniDownloader.exe "https://github.com/Aniketkumar-01/socials_downloader/releases/download/v1.4.0/OmniDownloader.exe" || true
+            curl -L -f -s -o dist-release/OmniDownloader-Setup.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe" || true
+            curl -L -f -s -o dist-release/OmniDownloader.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader.exe" || true
           fi
           ls -la dist-release/
 
@@ -165,20 +165,20 @@ jobs:
             ### 📱 Android Mobile Download
             | File | Type | Download Link | Description |
             | :--- | :--- | :--- | :--- |
-            | **`OmniDownloader.apk`** | **Android App (Universal)** | [⬇️ Download APK](https://github.com/Aniketkumar-01/socials_downloader/releases/latest/download/OmniDownloader.apk) | Standalone native Android application. Download media directly to your phone's Gallery, VLC, and Music library with system Share Sheet integration. |
+            | **`OmniDownloader.apk`** | **Android App (arm64-v8a)** | [⬇️ Download APK](https://github.com/Aniketkumar-01/omni_downloader/releases/latest/download/OmniDownloader.apk) | Standalone native Android application optimized for 64-bit ARM devices (lightweight ~55 MB). Download media directly to your phone's Gallery, VLC, and Music library with system Share Sheet integration. |
 
             ---
 
             ### 🪟 Windows Desktop Downloads
             | File | Type | Download Link | Description |
             | :--- | :--- | :--- | :--- |
-            | **`OmniDownloader-Setup.exe`** | **Installer (Recommended)** | [⬇️ Download Installer](https://github.com/Aniketkumar-01/socials_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe) | 1-Click setup wizard. Adds Start Menu & Windows Search integration, desktop shortcut, and clean uninstall. |
-            | **`OmniDownloader.exe`** | **Portable Standalone** | [⬇️ Download Portable EXE](https://github.com/Aniketkumar-01/socials_downloader/releases/download/v1.4.0/OmniDownloader.exe) | Single binary executable. No installation required; run directly from any folder or USB. |
+            | **`OmniDownloader-Setup.exe`** | **Installer (Recommended)** | [⬇️ Download Installer](https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe) | 1-Click setup wizard. Adds Start Menu & Windows Search integration, desktop shortcut, and clean uninstall. |
+            | **`OmniDownloader.exe`** | **Portable Standalone** | [⬇️ Download Portable EXE](https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader.exe) | Single binary executable. No installation required; run directly from any folder or USB. |
 
             ---
 
             ### ✨ Key Features:
-            - 📱 **Native Android Mobile App**: 100% on-device embedded CPython + `yt-dlp` + FFmpeg.
+            - 📱 **Native Android Mobile App**: 100% on-device embedded CPython + `yt-dlp` + FFmpeg (optimized for `arm64-v8a`, ~55 MB).
             - 🔗 **Android Share Sheet Receiver**: Tap "Share" in YouTube, Instagram, or TikTok and pick OmniDownloader.
             - 🛡️ **Production Security Hardened**: Hardened against command injection, token exfiltration, and path traversal.
             - 📑 **Smart Playlist & Batch Engine**: Detects and extracts playlists with granular item selection checkboxes.

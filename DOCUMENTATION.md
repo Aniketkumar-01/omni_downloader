@@ -3,7 +3,7 @@
 > **Version:** 1.3.5  
 > **Target OS:** Windows 10 / 11 (x64)  
 > **Architecture:** Local-First Micro-Service / Hybrid Desktop Client  
-> **Repository:** [Aniketkumar-01/socials_downloader](https://github.com/Aniketkumar-01/socials_downloader)  
+> **Repository:** [Aniketkumar-01/omni_downloader](https://github.com/Aniketkumar-01/omni_downloader)  
 > **License:** MIT  
 
 ---

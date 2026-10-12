@@ -28,8 +28,8 @@ data class AppUpdateInfo(
 
 object UpdateManager {
     private const val TAG = "UpdateManager"
-    const val CURRENT_APP_VERSION = "1.4.4"
-    private const val GITHUB_API_URL = "https://api.github.com/repos/Aniketkumar-01/socials_downloader/releases/latest"
+    const val CURRENT_APP_VERSION = "1.4.5"
+    private const val GITHUB_API_URL = "https://api.github.com/repos/Aniketkumar-01/omni_downloader/releases/latest"
 
     suspend fun checkForUpdates(): Result<AppUpdateInfo> = withContext(Dispatchers.IO) {
         try {
@@ -200,7 +200,7 @@ object UpdateManager {
         } catch (e: Exception) {
             Log.e(TAG, "Launch APK install failed: ${e.message}", e)
             // Fallback to opening browser release page if install intent fails
-            openDownloadUrl(context, "https://github.com/Aniketkumar-01/socials_downloader/releases/latest")
+            openDownloadUrl(context, "https://github.com/Aniketkumar-01/omni_downloader/releases/latest")
             Result.failure(e)
         }
     }

@@ -11,17 +11,18 @@ android {
         applicationId = "com.omni.downloader"
         minSdk = 24
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.4.4"
+        versionCode = 6
+        versionName = "1.4.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        // Native ABIs supported by embedded Python & FFmpeg
+        // Native ABIs: Target 64-bit ARM (arm64-v8a) exclusively for ~55 MB lightweight APK
         ndk {
-            abiFilters.addAll(setOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64"))
+            abiFilters.clear()
+            abiFilters.add("arm64-v8a")
         }
     }
 

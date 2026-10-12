@@ -6,13 +6,13 @@
 
 *Download videos, Reels, Shorts, and entire playlists from YouTube, Instagram, TikTok, X (Twitter), Bilibili, and 1,000+ sites at full quality with real-time SSE progress.*
 
-[![Latest Release](https://img.shields.io/github/v/release/Aniketkumar-01/socials_downloader?color=00f0b5&label=Release&style=flat-square)](https://github.com/Aniketkumar-01/socials_downloader/releases)
+[![Latest Release](https://img.shields.io/github/v/release/Aniketkumar-01/omni_downloader?color=00f0b5&label=Release&style=flat-square)](https://github.com/Aniketkumar-01/omni_downloader/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00d2ff.svg?style=flat-square)](LICENSE)
-[![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0e121a.svg?style=flat-square&logo=windows)](https://github.com/Aniketkumar-01/socials_downloader/releases)
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0e121a.svg?style=flat-square&logo=windows)](https://github.com/Aniketkumar-01/omni_downloader/releases)
 [![Platform: Android](https://img.shields.io/badge/Platform-Android%207.0%2B-3DDC84.svg?style=flat-square&logo=android)](android/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
 
-[**Download Windows Installer**](https://github.com/Aniketkumar-01/socials_downloader/releases/latest) • [**Android App Guide**](android/README.md) • [**Architecture & Documentation**](DOCUMENTATION.md) • [**Features**](#-features) • [**Quick Start**](#-quick-start-no-python-required) • [**FFmpeg Setup**](#-ffmpeg-setup-for-1080p-4k--mp3)
+[**Download Windows Installer**](https://github.com/Aniketkumar-01/omni_downloader/releases/latest) • [**Android App Guide**](android/README.md) • [**Architecture & Documentation**](DOCUMENTATION.md) • [**Features**](#-features) • [**Quick Start**](#-quick-start-no-python-required) • [**FFmpeg Setup**](#-ffmpeg-setup-for-1080p-4k--mp3)
 
 </div>
 
@@ -41,7 +41,7 @@
 For regular Windows users, OmniDownloader is distributed as a pre-compiled Windows application that runs out-of-the-box:
 
 ### 1. Download
-Visit the [**Latest GitHub Releases**](https://github.com/Aniketkumar-01/socials_downloader/releases/latest) page and download:
+Visit the [**Latest GitHub Releases**](https://github.com/Aniketkumar-01/omni_downloader/releases/latest) page and download:
 - **`OmniDownloader-Setup.exe` (Recommended)**:
   - Modern Windows Setup wizard.
   - Adds **OmniDownloader** to your **Start Menu** and makes it searchable via Windows Search (<kbd>Win</kbd> + type `"Omni"`).
@@ -120,8 +120,8 @@ If you are a developer looking to run or contribute to OmniDownloader from sourc
 
 ### 1. Clone Repository
 ```powershell
-git clone https://github.com/Aniketkumar-01/socials_downloader.git
-cd socials_downloader
+git clone https://github.com/Aniketkumar-01/omni_downloader.git
+cd omni_downloader
 ```
 
 ### 2. Run with 1-Click Launcher

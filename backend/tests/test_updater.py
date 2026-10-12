@@ -48,12 +48,12 @@ def test_check_update_endpoint_newer_version():
         "tag_name": "v1.4.0",
         "name": "OmniDownloader v1.4.0 - Performance Release",
         "body": "### Changes\n- Faster downloads\n- Updated engine",
-        "html_url": "https://github.com/Aniketkumar-01/socials_downloader/releases/tag/v1.4.0",
+        "html_url": "https://github.com/Aniketkumar-01/omni_downloader/releases/tag/v1.4.0",
         "published_at": "2026-10-06T12:00:00Z",
         "assets": [
             {
                 "name": "OmniDownloader-Setup.exe",
-                "browser_download_url": "https://github.com/Aniketkumar-01/socials_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe",
+                "browser_download_url": "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe",
                 "size": 50123456
             }
         ]
@@ -71,7 +71,7 @@ def test_check_update_endpoint_newer_version():
         assert data["update_available"] is True
         assert data["latest_version"] == "1.4.0"
         assert data["current_version"] == APP_VERSION
-        assert data["download_url"] == "https://github.com/Aniketkumar-01/socials_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe"
+        assert data["download_url"] == "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe"
         assert data["file_size"] == 50123456
 
 def test_check_update_endpoint_already_up_to_date():
@@ -79,7 +79,7 @@ def test_check_update_endpoint_already_up_to_date():
         "tag_name": f"v{APP_VERSION}",
         "name": f"OmniDownloader v{APP_VERSION}",
         "body": "Current release notes",
-        "html_url": f"https://github.com/Aniketkumar-01/socials_downloader/releases/tag/v{APP_VERSION}",
+        "html_url": f"https://github.com/Aniketkumar-01/omni_downloader/releases/tag/v{APP_VERSION}",
         "assets": []
     }
 

@@ -1119,7 +1119,7 @@ fun MainScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (info.isUpdateAvailable && info.apkDownloadUrl != null) {
                         TextButton(onClick = {
-                            UpdateManager.openDownloadUrl(context, "https://github.com/Aniketkumar-01/socials_downloader/releases/latest")
+                            UpdateManager.openDownloadUrl(context, "https://github.com/Aniketkumar-01/omni_downloader/releases/latest")
                         }) {
                             Text("Browser", fontSize = 11.sp, color = TextSecondary)
                         }
