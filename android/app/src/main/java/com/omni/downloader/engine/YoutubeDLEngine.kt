@@ -313,6 +313,20 @@ object YoutubeDLEngine {
     }
 
     /**
+     * Terminate an ongoing native yt-dlp process by its tracking processId.
+     */
+    fun cancelProcess(processId: String): Boolean {
+        return try {
+            val destroyed = YoutubeDL.getInstance().destroyProcessById(processId)
+            Log.d(TAG, "Destroyed process $processId: $destroyed")
+            destroyed
+        } catch (e: Exception) {
+            Log.w(TAG, "Error terminating process $processId: ${e.message}")
+            false
+        }
+    }
+
+    /**
      * Executes the download with real-time progress callbacks, pause/resume support,
      * un-capped resolution, and full playlist & batch download support.
      */
@@ -322,6 +336,7 @@ object YoutubeDLEngine {
         qualityId: String,
         targetDir: File,
         isPlaylist: Boolean = false,
+        processId: String? = null,
         onProgress: (progress: Float, etaInSeconds: Long, line: String) -> Unit
     ): Result<List<File>> = withContext(Dispatchers.IO) {
         try {
@@ -429,10 +444,18 @@ object YoutubeDLEngine {
                         val singleUrl = preprocessUrl(rawSingleUrl)
                         val req = YoutubeDLRequest(singleUrl)
                         configureRequest(req, singleUrl, false, idx)
-                        YoutubeDL.getInstance().execute(req) { progress, eta, line ->
-                            val overallProgress = ((idx.toFloat() + (progress / 100f)) / urls.size.toFloat()) * 100f
-                            val batchLine = "Downloading video ${idx + 1} of ${urls.size} • ${line ?: ""}"
-                            onProgress(overallProgress, eta, batchLine)
+                        if (processId != null) {
+                            YoutubeDL.getInstance().execute(req, processId) { progress, eta, line ->
+                                val overallProgress = ((idx.toFloat() + (progress / 100f)) / urls.size.toFloat()) * 100f
+                                val batchLine = "Downloading video ${idx + 1} of ${urls.size} • ${line ?: ""}"
+                                onProgress(overallProgress, eta, batchLine)
+                            }
+                        } else {
+                            YoutubeDL.getInstance().execute(req) { progress, eta, line ->
+                                val overallProgress = ((idx.toFloat() + (progress / 100f)) / urls.size.toFloat()) * 100f
+                                val batchLine = "Downloading video ${idx + 1} of ${urls.size} • ${line ?: ""}"
+                                onProgress(overallProgress, eta, batchLine)
+                            }
                         }
                     } catch (itemErr: Exception) {
                         Log.w(TAG, "Batch item ${idx + 1} failed: ${itemErr.message}", itemErr)
@@ -447,8 +470,14 @@ object YoutubeDLEngine {
                 val req = YoutubeDLRequest(singleUrl)
                 configureRequest(req, singleUrl, isTargetPlaylist, 0)
                 try {
-                    YoutubeDL.getInstance().execute(req) { progress, eta, line ->
-                        onProgress(progress, eta, line ?: "")
+                    if (processId != null) {
+                        YoutubeDL.getInstance().execute(req, processId) { progress, eta, line ->
+                            onProgress(progress, eta, line ?: "")
+                        }
+                    } else {
+                        YoutubeDL.getInstance().execute(req) { progress, eta, line ->
+                            onProgress(progress, eta, line ?: "")
+                        }
                     }
                 } catch (execErr: Exception) {
                     Log.w(TAG, "Download execution error: ${execErr.message}", execErr)

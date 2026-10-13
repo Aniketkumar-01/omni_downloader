@@ -245,7 +245,7 @@ fun DownloadsSheet(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 320.dp),
+                        .heightIn(max = 440.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(downloadHistory, key = { it.taskId }) { historyItem ->

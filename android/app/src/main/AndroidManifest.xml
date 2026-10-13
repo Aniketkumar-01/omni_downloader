@@ -46,6 +46,7 @@
         <service
             android:name=".service.DownloadForegroundService"
             android:exported="false"
+            android:stopWithTask="false"
             android:foregroundServiceType="dataSync" />
 
     </application>

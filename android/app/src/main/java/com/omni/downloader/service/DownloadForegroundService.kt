@@ -25,13 +25,15 @@ class DownloadForegroundService : Service() {
     private var downloadJob: Job? = null
     private var wakeLock: PowerManager.WakeLock? = null
 
-    private var activeTaskId: String = UUID.randomUUID().toString()
+    private var activeTaskId: String = "dl_task"
     private var activeUrl: String = ""
     private var activeQuality: String = "best"
     private var activeTitle: String = "Media Download"
     private var activeIsAudio: Boolean = false
     private var activeIsPlaylist: Boolean = false
     private var isPaused: Boolean = false
+    private var isCancelled: Boolean = false
+    private var lastProgressEmitTime: Long = 0L
 
     private var playlistCompleted: Int = 0
     private var playlistTotal: Int = 1
@@ -100,17 +102,26 @@ class DownloadForegroundService : Service() {
         }
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        Log.d(TAG, "onTaskRemoved: OmniDownloader removed from recents. Foreground download continues uninterrupted.")
+        // Do NOT call stopSelf(). Foreground service continues downloading in background.
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> {
-                activeUrl = intent.getStringExtra(EXTRA_URL) ?: return START_NOT_STICKY
+                activeUrl = intent.getStringExtra(EXTRA_URL) ?: return START_STICKY
                 activeQuality = intent.getStringExtra(EXTRA_QUALITY) ?: "best"
                 activeTitle = intent.getStringExtra(EXTRA_TITLE) ?: "Media Download"
                 activeIsAudio = intent.getBooleanExtra(EXTRA_IS_AUDIO, false)
                 activeIsPlaylist = intent.getBooleanExtra(EXTRA_IS_PLAYLIST, false)
 
-                activeTaskId = UUID.randomUUID().toString()
+                val urlHash = kotlin.math.abs(activeUrl.hashCode()).toString(16)
+                activeTaskId = "dl_$urlHash"
                 isPaused = false
+                isCancelled = false
+                lastProgressEmitTime = 0L
                 playlistCompleted = 0
                 playlistTotal = 1
 
@@ -131,16 +142,21 @@ class DownloadForegroundService : Service() {
 
             ACTION_PAUSE -> {
                 isPaused = true
+                isCancelled = false
+                YoutubeDLEngine.cancelProcess(activeTaskId)
                 downloadJob?.cancel()
                 val current = DownloadTracker.activeTask.value
-                if (current != null) {
-                    DownloadTracker.updateProgress(
-                        current.copy(
-                            status = TaskStatus.PAUSED,
-                            speedFormatted = "--"
-                        )
+                DownloadTracker.updateProgress(
+                    (current ?: DownloadTaskProgress(
+                        taskId = activeTaskId,
+                        currentTitle = activeTitle,
+                        isAudio = activeIsAudio
+                    )).copy(
+                        status = TaskStatus.PAUSED,
+                        speedFormatted = "--",
+                        etaFormatted = ""
                     )
-                }
+                )
                 val notificationManager = getSystemService(NotificationManager::class.java)
                 notificationManager?.notify(NOTIFICATION_ID, buildPausedNotification(activeTitle))
             }
@@ -148,6 +164,7 @@ class DownloadForegroundService : Service() {
             ACTION_RESUME -> {
                 if (isPaused && activeUrl.isNotBlank()) {
                     isPaused = false
+                    isCancelled = false
                     val current = DownloadTracker.activeTask.value
                     if (current != null) {
                         DownloadTracker.updateProgress(
@@ -155,14 +172,26 @@ class DownloadForegroundService : Service() {
                         )
                     }
                     val notificationManager = getSystemService(NotificationManager::class.java)
-                    notificationManager?.notify(NOTIFICATION_ID, buildProgressNotification(activeTitle, 0f, "Resuming download..."))
+                    notificationManager?.notify(NOTIFICATION_ID, buildProgressNotification(activeTitle, current?.progressPercent ?: 0f, "Resuming download..."))
                     runDownload()
                 }
             }
 
             ACTION_CANCEL -> {
+                isCancelled = true
                 isPaused = false
+                YoutubeDLEngine.cancelProcess(activeTaskId)
                 downloadJob?.cancel()
+
+                try {
+                    val taskTempDir = java.io.File(StorageHelper.getTempDownloadDir(this), activeTaskId)
+                    if (taskTempDir.exists()) {
+                        taskTempDir.deleteRecursively()
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Temp dir cleanup on cancel: ${e.message}")
+                }
+
                 DownloadTracker.updateProgress(
                     DownloadTaskProgress(
                         taskId = activeTaskId,
@@ -174,10 +203,11 @@ class DownloadForegroundService : Service() {
                 )
                 val notificationManager = getSystemService(NotificationManager::class.java)
                 notificationManager?.cancel(NOTIFICATION_ID)
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     private fun runDownload() {
@@ -188,41 +218,62 @@ class DownloadForegroundService : Service() {
                 url = activeUrl,
                 qualityId = activeQuality,
                 targetDir = taskTempDir,
-                isPlaylist = activeIsPlaylist
+                isPlaylist = activeIsPlaylist,
+                processId = activeTaskId
             ) { progress, eta, line ->
-                val etaText = if (eta > 0) "${eta}s remaining" else ""
-                val speed = extractSpeed(line)
-
-                // Detect playlist progress lines: e.g. "Downloading video 3 of 12" or "Downloading item 3 of 12"
-                val playlistMatch = Regex("""(?:Downloading\s+(?:video|item)|\[download\])\s*(\d+)\s+of\s+(\d+)""", RegexOption.IGNORE_CASE).find(line)
-                if (playlistMatch != null) {
-                    playlistCompleted = playlistMatch.groupValues[1].toIntOrNull() ?: playlistCompleted
-                    playlistTotal = playlistMatch.groupValues[2].toIntOrNull() ?: playlistTotal
+                // Guard: Ignore callbacks if paused or cancelled
+                if (isPaused || isCancelled || !isActive) {
+                    return@executeDownload
                 }
 
-                val statusText = if (playlistTotal > 1) {
-                    "Item $playlistCompleted of $playlistTotal • ${progress.toInt()}% • $speed"
-                } else {
-                    "${progress.toInt()}% • $speed"
+                // Parse playlist progress ONLY if activeIsPlaylist is true and line does not describe fragments
+                if (activeIsPlaylist && !line.contains("frag", ignoreCase = true)) {
+                    val playlistMatch = Regex("""(?:Downloading\s+(?:video|item)|\[download\])\s*(\d+)\s+of\s+(\d+)""", RegexOption.IGNORE_CASE).find(line)
+                    if (playlistMatch != null) {
+                        val currentItem = playlistMatch.groupValues[1].toIntOrNull()
+                        val totalItems = playlistMatch.groupValues[2].toIntOrNull()
+                        if (currentItem != null && totalItems != null && totalItems > 1) {
+                            playlistCompleted = currentItem
+                            playlistTotal = totalItems
+                        }
+                    }
                 }
 
-                updateNotification(activeTitle, progress, statusText)
-                DownloadTracker.updateProgress(
-                    DownloadTaskProgress(
-                        taskId = activeTaskId,
-                        status = TaskStatus.DOWNLOADING,
-                        progressPercent = progress,
-                        etaFormatted = etaText,
-                        speedFormatted = speed,
-                        currentTitle = activeTitle,
-                        completedItems = playlistCompleted,
-                        totalItems = playlistTotal,
-                        isAudio = activeIsAudio
+                val now = System.currentTimeMillis()
+                // Throttle notifications and tracker updates to at most once per 250ms unless it hits 100%
+                if (now - lastProgressEmitTime >= 250L || progress >= 99.5f) {
+                    lastProgressEmitTime = now
+                    val etaText = if (eta > 0) "${eta}s remaining" else ""
+                    val speed = extractSpeed(line)
+
+                    val statusText = if (playlistTotal > 1) {
+                        "Item $playlistCompleted of $playlistTotal • ${progress.toInt()}% • $speed"
+                    } else {
+                        "${progress.toInt()}% • $speed"
+                    }
+
+                    updateNotification(activeTitle, progress, statusText)
+                    DownloadTracker.updateProgress(
+                        DownloadTaskProgress(
+                            taskId = activeTaskId,
+                            status = TaskStatus.DOWNLOADING,
+                            progressPercent = progress,
+                            etaFormatted = etaText,
+                            speedFormatted = speed,
+                            currentTitle = activeTitle,
+                            completedItems = playlistCompleted,
+                            totalItems = playlistTotal,
+                            isAudio = activeIsAudio
+                        )
                     )
-                )
+                }
             }
 
             result.onSuccess { completedFiles ->
+                if (isPaused || isCancelled || !isActive) {
+                    return@onSuccess
+                }
+
                 var lastSavedUri: String? = null
                 var savedCount = 0
 
@@ -255,10 +306,22 @@ class DownloadForegroundService : Service() {
                     )
                 )
                 showCompleteNotification(activeTitle, savedCount, lastSavedUri)
+                stopForeground(STOP_FOREGROUND_DETACH)
                 stopSelf()
             }.onFailure { error ->
+                if (isPaused) {
+                    Log.d(TAG, "Download paused intentionally for task $activeTaskId")
+                    return@onFailure
+                }
+
+                if (isCancelled) {
+                    taskTempDir.deleteRecursively()
+                    Log.d(TAG, "Download cancelled intentionally for task $activeTaskId")
+                    return@onFailure
+                }
+
                 taskTempDir.deleteRecursively()
-                if (!isPaused && isActive) {
+                if (isActive) {
                     Log.e(TAG, "Download failed: ${error.message}", error)
                     DownloadTracker.updateProgress(
                         DownloadTaskProgress(
@@ -270,6 +333,7 @@ class DownloadForegroundService : Service() {
                         )
                     )
                     showFailedNotification(activeTitle, error.message ?: "Download encountered an error")
+                    stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 }
             }

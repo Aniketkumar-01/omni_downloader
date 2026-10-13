@@ -14,6 +14,7 @@ object DownloadTracker {
     private const val TAG = "DownloadTracker"
     private const val PREFS_NAME = "omni_download_history"
     private const val KEY_HISTORY = "history_json"
+    private const val KEY_ACTIVE_TASK = "active_task_json"
 
     private var prefs: SharedPreferences? = null
 
@@ -27,6 +28,31 @@ object DownloadTracker {
         if (prefs == null) {
             prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             loadHistory()
+            loadActiveTask()
+        }
+    }
+
+    private fun loadActiveTask() {
+        val jsonStr = prefs?.getString(KEY_ACTIVE_TASK, null) ?: return
+        try {
+            val obj = JSONObject(jsonStr)
+            val statusStr = obj.optString("status", TaskStatus.DOWNLOADING.name)
+            val status = try { TaskStatus.valueOf(statusStr) } catch (_: Exception) { TaskStatus.DOWNLOADING }
+            if (status == TaskStatus.DOWNLOADING || status == TaskStatus.PAUSED) {
+                _activeTask.value = DownloadTaskProgress(
+                    taskId = obj.optString("taskId", ""),
+                    status = status,
+                    progressPercent = obj.optDouble("progressPercent", 0.0).toFloat(),
+                    currentTitle = obj.optString("currentTitle", ""),
+                    speedFormatted = obj.optString("speedFormatted", "--"),
+                    etaFormatted = obj.optString("etaFormatted", "--"),
+                    completedItems = obj.optInt("completedItems", 0),
+                    totalItems = obj.optInt("totalItems", 1),
+                    isAudio = obj.optBoolean("isAudio", false)
+                )
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to load active task: ${e.message}")
         }
     }
 
@@ -83,12 +109,31 @@ object DownloadTracker {
 
     fun updateProgress(task: DownloadTaskProgress) {
         _activeTask.value = task
+        val p = prefs
         if (task.status == TaskStatus.COMPLETED || task.status == TaskStatus.FAILED || task.status == TaskStatus.CANCELLED) {
             _history.value = listOf(task) + _history.value.filter { it.taskId != task.taskId }
             if (_activeTask.value?.taskId == task.taskId) {
                 _activeTask.value = null
             }
             saveHistory()
+            p?.edit()?.remove(KEY_ACTIVE_TASK)?.apply()
+        } else {
+            try {
+                val obj = JSONObject().apply {
+                    put("taskId", task.taskId)
+                    put("status", task.status.name)
+                    put("progressPercent", task.progressPercent.toDouble())
+                    put("currentTitle", task.currentTitle)
+                    put("speedFormatted", task.speedFormatted)
+                    put("etaFormatted", task.etaFormatted)
+                    put("completedItems", task.completedItems)
+                    put("totalItems", task.totalItems)
+                    put("isAudio", task.isAudio)
+                }
+                p?.edit()?.putString(KEY_ACTIVE_TASK, obj.toString())?.apply()
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to persist active task: ${e.message}")
+            }
         }
     }
 
