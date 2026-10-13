@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
@@ -109,7 +111,13 @@ class DownloadForegroundService : Service() {
                 activeIsAudio = intent.getBooleanExtra(EXTRA_IS_AUDIO, false)
                 activeIsPlaylist = intent.getBooleanExtra(EXTRA_IS_PLAYLIST, false)
 
-                activeTaskId = UUID.randomUUID().toString()
+                // Deterministic taskId based on URL + quality so temp directory and partial (.part)
+                // files are preserved if system restarts service or resumes interrupted download
+                val urlHash = java.security.MessageDigest.getInstance("MD5")
+                    .digest("$activeUrl:$activeQuality".toByteArray())
+                    .joinToString("") { "%02x".format(it) }
+                    .take(16)
+                activeTaskId = "dl_$urlHash"
                 isPaused = false
                 playlistCompleted = 0
                 playlistTotal = 1
@@ -125,8 +133,14 @@ class DownloadForegroundService : Service() {
                     )
                 )
 
-                startForeground(NOTIFICATION_ID, buildProgressNotification(activeTitle, 0f, "Starting download..."))
+                val notif = buildProgressNotification(activeTitle, 0f, "Starting download...")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(NOTIFICATION_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                } else {
+                    startForeground(NOTIFICATION_ID, notif)
+                }
                 runDownload()
+                return START_REDELIVER_INTENT
             }
 
             ACTION_PAUSE -> {
@@ -143,6 +157,7 @@ class DownloadForegroundService : Service() {
                 }
                 val notificationManager = getSystemService(NotificationManager::class.java)
                 notificationManager?.notify(NOTIFICATION_ID, buildPausedNotification(activeTitle))
+                return START_NOT_STICKY
             }
 
             ACTION_RESUME -> {
@@ -157,6 +172,7 @@ class DownloadForegroundService : Service() {
                     val notificationManager = getSystemService(NotificationManager::class.java)
                     notificationManager?.notify(NOTIFICATION_ID, buildProgressNotification(activeTitle, 0f, "Resuming download..."))
                     runDownload()
+                    return START_REDELIVER_INTENT
                 }
             }
 
@@ -175,9 +191,18 @@ class DownloadForegroundService : Service() {
                 val notificationManager = getSystemService(NotificationManager::class.java)
                 notificationManager?.cancel(NOTIFICATION_ID)
                 stopSelf()
+                return START_NOT_STICKY
             }
         }
-        return START_NOT_STICKY
+        return if (downloadJob?.isActive == true && !isPaused) START_REDELIVER_INTENT else START_NOT_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        // Keep foreground service and active download running even when user swipes away app from Recents.
+        // Returning START_REDELIVER_INTENT and android:stopWithTask="false" in AndroidManifest
+        // ensures the process is not destroyed when the user clears the recent apps screen.
+        Log.i(TAG, "Task swiped from Recents overview. Active download continues in foreground.")
     }
 
     private fun runDownload() {
