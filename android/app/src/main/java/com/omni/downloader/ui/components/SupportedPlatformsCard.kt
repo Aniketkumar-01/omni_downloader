@@ -176,7 +176,12 @@ fun SupportedPlatformsCard(
             }
 
             Spacer(modifier = Modifier.height(18.dp))
-            HorizontalDivider(color = BorderSubtle, thickness = 1.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(BorderSubtle)
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             // Capabilities Showcase
@@ -252,8 +257,9 @@ private fun PlatformChip(
     )
 
     Surface(
-        onClick = onClick,
-        modifier = modifier.height(68.dp),
+        modifier = modifier
+            .height(68.dp)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(10.dp),
         color = bgColor,
         border = BorderStroke(if (isDetected) 1.5.dp else 1.dp, borderColor)

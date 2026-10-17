@@ -191,7 +191,7 @@ fun MainScreen(
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column {
                                         Text(
-                                            text = task.title.ifBlank { "Downloading media..." },
+                                            text = task.currentTitle.ifBlank { "Downloading media..." },
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = TextPrimary,
@@ -199,7 +199,7 @@ fun MainScreen(
                                             overflow = TextOverflow.Ellipsis
                                         )
                                         Text(
-                                            text = "${task.progress.toInt()}% • ${task.speed.ifBlank { "Calculating..." }} • Tap to view",
+                                            text = "${task.progressPercent.toInt()}% • ${task.speedFormatted.ifBlank { "Calculating..." }} • Tap to view",
                                             fontSize = 11.sp,
                                             color = TextSecondary
                                         )
@@ -225,7 +225,7 @@ fun MainScreen(
 
                             Spacer(modifier = Modifier.height(8.dp))
                             LinearProgressIndicator(
-                                progress = { task.progress / 100f },
+                                progress = (task.progressPercent / 100f).coerceIn(0f, 1f),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(4.dp)

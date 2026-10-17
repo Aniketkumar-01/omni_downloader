@@ -57,5 +57,6 @@ publish_release.bat
 release_android.bat
 update_tag.py
 .commit_msg
+commit_msg.txt
 preview.html
 

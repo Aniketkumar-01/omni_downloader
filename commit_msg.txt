@@ -1,0 +1,6 @@
+Fix(android): Resolve DownloadTaskProgress property references, Compose LinearProgressIndicator and vector drawables
+
+- Fix DownloadTaskProgress property access: currentTitle, progressPercent, speedFormatted
+- Fix LinearProgressIndicator progress parameter type (Float instead of lambda)
+- Replace experimental Surface(onClick) with standard Modifier.clickable in SupportedPlatformsCard
+- Standardize VectorDrawable SVG pathData syntax across all platform icons
