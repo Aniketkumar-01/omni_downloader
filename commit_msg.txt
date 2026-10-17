@@ -1,6 +1,5 @@
-Fix(desktop): Auto-dispatch next FIFO queued video when cancelling active download
+Fix(desktop): Ensure Pause and Cancel buttons remain visible during active downloads
 
-- Ensure cancelActiveDownload polls and triggers the next queued task via pollNextDesktopTask()
-- Export and invoke prepareQueuedProgressView for immediate visual transition to the next queued item
-- Reset isDownloading flag and update UI smoothly when queue becomes empty
-- Prevent frozen "Download was cancelled" state on Windows desktop
+- Remove inline display:none from #btn-pause-download and #btn-cancel-download in index.html
+- Add safeguard in onProgress handler to guarantee pause/cancel buttons remain visible (inline-flex) during active download ticks
+- Only hide buttons when download status is completed or 100%

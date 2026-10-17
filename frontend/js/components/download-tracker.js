@@ -185,6 +185,14 @@ export function showProgressView(taskId, queuedTask = null) {
       if (data.status === "completed" || pct >= 100) {
         if (btnCancelDownload) btnCancelDownload.style.display = "none";
         if (btnPauseDownload) btnPauseDownload.style.display = "none";
+      } else {
+        if (btnCancelDownload && btnCancelDownload.style.display === "none") {
+          btnCancelDownload.style.display = "inline-flex";
+          btnCancelDownload.disabled = false;
+        }
+        if (btnPauseDownload && btnPauseDownload.style.display === "none") {
+          btnPauseDownload.style.display = "inline-flex";
+        }
       }
 
       const currentMedia = store.get("currentMedia");
