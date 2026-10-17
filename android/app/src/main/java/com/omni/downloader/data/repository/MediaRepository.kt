@@ -27,6 +27,8 @@ interface MediaRepository {
     fun pauseDownload(context: Context)
     fun resumeDownload(context: Context)
     fun cancelDownload(context: Context)
+    fun cancelAllDownloads(context: Context)
+    fun removeQueuedDownload(context: Context, taskId: String)
 }
 
 /**
@@ -77,5 +79,13 @@ class DefaultMediaRepository : MediaRepository {
 
     override fun cancelDownload(context: Context) {
         DownloadForegroundService.cancelDownload(context)
+    }
+
+    override fun cancelAllDownloads(context: Context) {
+        DownloadForegroundService.cancelAllDownloads(context)
+    }
+
+    override fun removeQueuedDownload(context: Context, taskId: String) {
+        DownloadForegroundService.removeQueuedDownload(context, taskId)
     }
 }

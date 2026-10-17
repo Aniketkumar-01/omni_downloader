@@ -1,5 +1,6 @@
 package com.omni.downloader.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -32,8 +34,9 @@ fun PlaylistVideosCard(
     if (items.isEmpty()) return
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        border = BorderStroke(1.dp, BorderSubtle),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -52,7 +55,7 @@ fun PlaylistVideosCard(
                     Text(
                         "${selectedIds.size} of ${items.size} selected",
                         fontSize = 11.sp,
-                        color = AccentCyan
+                        color = AccentCobaltLight
                     )
                 }
 
@@ -68,7 +71,7 @@ fun PlaylistVideosCard(
                 ) {
                     Text(
                         text = if (selectedIds.size == items.size) "Deselect All" else "Select All",
-                        color = AccentTeal,
+                        color = AccentCobalt,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -95,9 +98,9 @@ fun PlaylistVideosCard(
                             checked = isSelected,
                             onCheckedChange = { onToggleItem(item.id) },
                             colors = CheckboxDefaults.colors(
-                                checkedColor = AccentTeal,
+                                checkedColor = AccentCobalt,
                                 uncheckedColor = TextSecondary,
-                                checkmarkColor = BgDark
+                                checkmarkColor = Color.White
                             ),
                             modifier = Modifier.size(24.dp)
                         )

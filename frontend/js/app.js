@@ -32,6 +32,11 @@ import {
   hideProgressView, 
   initDownloadTracker 
 } from "./components/download-tracker.js";
+import { 
+  initDownloadQueue, 
+  enqueueDesktopTask, 
+  pollNextDesktopTask 
+} from "./components/download-queue.js";
 import { initSettings } from "./components/settings-dialog.js";
 import { initUpdater } from "./components/updater-dialog.js";
 
@@ -161,7 +166,9 @@ async function handleUrlSubmission(e) {
 
   setLoading(true);
   hideMediaPreview();
-  hideProgressView();
+  if (!store.get("isDownloading")) {
+    hideProgressView();
+  }
 
   try {
     let info;
@@ -187,6 +194,32 @@ async function handleUrlSubmission(e) {
   }
 }
 
+// Queued download dispatcher
+async function startQueuedTask(task) {
+  clearError();
+  store.set("activeDownloadUrl", task.url);
+  try {
+    const res = await startDownload({
+      url: task.url,
+      isPlaylist: task.isPlaylist,
+      selectedVideoIds: task.selectedVideoIds,
+      batchItems: task.batchItems,
+      playlistTitle: task.playlistTitle,
+      quality: task.quality,
+      downloadDir: task.downloadDir || null,
+    });
+    showProgressView(res.task_id);
+  } catch (err) {
+    showError(err);
+    store.set("isDownloading", false);
+    setDownloadButtonState("ready");
+    const nextTask = pollNextDesktopTask();
+    if (nextTask) {
+      startQueuedTask(nextTask);
+    }
+  }
+}
+
 // Download execution logic
 async function executeDownload() {
   const currentMedia = store.get("currentMedia");
@@ -203,14 +236,38 @@ async function executeDownload() {
   }
 
   const quality = qualitySelect ? qualitySelect.value : "best";
+
+  let downloadDir = folderPathInput ? folderPathInput.value.trim() : null;
+  if (downloadDir) {
+    downloadDir = downloadDir.replace(/^["']+|["']+$/g, '').trim();
+  }
+
+  // If a download is already in progress, enqueue this task!
+  if (store.get("isDownloading")) {
+    const queueItem = {
+      id: `q_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      url: currentMedia.url,
+      isPlaylist: currentMedia.is_playlist,
+      selectedVideoIds,
+      batchItems: (currentMedia.platform === "batch") ? currentMedia.items : null,
+      playlistTitle: currentMedia.title,
+      quality,
+      downloadDir: downloadDir || null,
+      title: currentMedia.title || "Media Download"
+    };
+    const position = enqueueDesktopTask(queueItem);
+    showToast(`Added to download queue (Position #${position}) • Will auto-start next`, "success");
+    setDownloadButtonState("ready", "Added to Queue ✓");
+    setTimeout(() => {
+      setDownloadButtonState("ready");
+    }, 2000);
+    return;
+  }
+
+  store.set("activeDownloadUrl", currentMedia.url);
   setDownloadButtonState("downloading", "Starting download...");
 
   try {
-    let downloadDir = folderPathInput ? folderPathInput.value.trim() : null;
-    if (downloadDir) {
-      downloadDir = downloadDir.replace(/^["']+|["']+$/g, '').trim();
-    }
-
     const res = await startDownload({
       url: currentMedia.url,
       isPlaylist: currentMedia.is_playlist,
@@ -224,6 +281,7 @@ async function executeDownload() {
     showProgressView(res.task_id);
   } catch (err) {
     showError(err);
+    store.set("isDownloading", false);
     setDownloadButtonState("ready");
   }
 }
@@ -234,7 +292,11 @@ function initApp() {
   initErrorAlert();
   initMediaPreview();
   initPlaylistManager();
-  initDownloadTracker({ onRestartDownload: executeDownload });
+  initDownloadQueue();
+  initDownloadTracker({ 
+    onRestartDownload: executeDownload,
+    onStartQueuedDownload: startQueuedTask
+  });
   initSettings();
   initUpdater({ onRetrySubmission: handleUrlSubmission });
 

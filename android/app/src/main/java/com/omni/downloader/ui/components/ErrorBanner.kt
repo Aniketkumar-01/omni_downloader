@@ -27,11 +27,10 @@ fun ErrorBanner(
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = StatusError.copy(alpha = 0.15f)),
-        modifier = modifier
-            .fillMaxWidth()
-            .border(1.dp, StatusError.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = StatusErrorContainer),
+        border = BorderStroke(1.dp, StatusError.copy(alpha = 0.4f)),
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.Top) {
@@ -61,14 +60,14 @@ fun ErrorBanner(
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
                     onClick = onUpdateEngine,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AccentCyan),
-                    border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.5f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AccentCobaltLight),
+                    border = BorderStroke(1.dp, AccentCobalt.copy(alpha = 0.4f)),
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Update Engine Core", fontSize = 11.sp)
+                    Text("Update Engine Core", fontSize = 11.sp, color = AccentCobaltLight)
                 }
             }
         }

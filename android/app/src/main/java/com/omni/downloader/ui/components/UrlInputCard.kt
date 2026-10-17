@@ -4,8 +4,11 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPaste
@@ -13,8 +16,11 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omni.downloader.ui.theme.*
@@ -35,8 +41,9 @@ fun UrlInputCard(
     val context = LocalContext.current
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        border = BorderStroke(1.dp, BorderSubtle),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -54,18 +61,31 @@ fun UrlInputCard(
                 placeholder = {
                     Text(
                         "Paste video, playlist, or batch links (one per line)",
-                        color = TextSecondary.copy(alpha = 0.6f)
+                        color = TextSecondary.copy(alpha = 0.5f)
                     )
                 },
                 singleLine = false,
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(10.dp),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search,
+                    keyboardType = KeyboardType.Uri
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        if (urlInput.isNotBlank() && !isFetching) {
+                            onFetchClick()
+                        }
+                    }
+                ),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = AccentTeal,
+                    focusedBorderColor = AccentCobalt,
                     unfocusedBorderColor = BorderSubtle,
                     focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary
+                    unfocusedTextColor = TextPrimary,
+                    focusedContainerColor = SurfaceInput,
+                    unfocusedContainerColor = SurfaceInput
                 ),
                 trailingIcon = {
                     if (urlInput.isNotBlank()) {
@@ -82,7 +102,7 @@ fun UrlInputCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Button(
+                OutlinedButton(
                     onClick = {
                         val clip = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                         if (clip.hasPrimaryClip() && clip.primaryClipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) == true) {
@@ -92,18 +112,24 @@ fun UrlInputCard(
                             }
                         }
                     },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SurfaceCard),
-                    modifier = Modifier.weight(1f)
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = SurfaceCard,
+                        contentColor = TextPrimary
+                    ),
+                    border = BorderStroke(1.dp, BorderSubtle),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(44.dp)
                 ) {
                     Icon(
                         Icons.Default.ContentPaste,
                         contentDescription = null,
-                        tint = AccentCyan,
+                        tint = TextSecondary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Paste", color = TextPrimary)
+                    Text("Paste", color = TextPrimary, fontSize = 13.sp)
                 }
 
                 Button(
@@ -115,27 +141,32 @@ fun UrlInputCard(
                         onFetchClick()
                     },
                     enabled = !isFetching,
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentTeal),
-                    modifier = Modifier.weight(1.5f)
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AccentCobalt,
+                        disabledContainerColor = SurfaceCard
+                    ),
+                    modifier = Modifier
+                        .weight(1.5f)
+                        .height(44.dp)
                 ) {
                     if (isFetching) {
                         CircularProgressIndicator(
-                            color = BgDark,
-                            modifier = Modifier.size(18.dp),
+                            color = Color.White,
+                            modifier = Modifier.size(16.dp),
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Fetching...", color = BgDark, fontWeight = FontWeight.Bold)
+                        Text("Fetching...", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     } else {
                         Icon(
                             Icons.Default.Search,
                             contentDescription = null,
-                            tint = BgDark,
-                            modifier = Modifier.size(18.dp)
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Fetch Details", color = BgDark, fontWeight = FontWeight.Bold)
+                        Text("Fetch Details", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
                 }
             }

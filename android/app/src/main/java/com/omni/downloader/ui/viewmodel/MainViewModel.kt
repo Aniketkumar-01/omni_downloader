@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.omni.downloader.OmniApplication
 import com.omni.downloader.data.DownloadTracker
 import com.omni.downloader.data.models.DownloadTaskProgress
+import com.omni.downloader.data.models.QueuedDownloadTask
+import com.omni.downloader.data.models.TaskStatus
 import com.omni.downloader.data.repository.DefaultMediaRepository
 import com.omni.downloader.data.repository.MediaRepository
 import com.omni.downloader.engine.StorageHelper
@@ -27,6 +29,7 @@ class MainViewModel(
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     val activeDownload: StateFlow<DownloadTaskProgress?> = DownloadTracker.activeTask
+    val queuedTasks: StateFlow<List<QueuedDownloadTask>> = DownloadTracker.queue
     val downloadHistory: StateFlow<List<DownloadTaskProgress>> = DownloadTracker.history
 
     fun onUrlChanged(url: String) {
@@ -133,6 +136,10 @@ class MainViewModel(
             meta.url
         }
 
+        val isBusy = DownloadTracker.activeTask.value != null && 
+            (DownloadTracker.activeTask.value?.status == TaskStatus.DOWNLOADING || 
+             DownloadTracker.activeTask.value?.status == TaskStatus.PAUSED)
+
         repository.startDownload(
             context = context,
             url = downloadUrl,
@@ -142,7 +149,10 @@ class MainViewModel(
             isPlaylist = if (isSubset) false else meta.isPlaylist
         )
 
-        val toastMsg = if (isPlaylist) {
+        val toastMsg = if (isBusy) {
+            val queuePos = DownloadTracker.queue.value.size + 1
+            "Added to queue (Position #$queuePos) • Will auto-start"
+        } else if (isPlaylist) {
             "Starting download for $selectedCount items! Tap Downloads icon to view progress."
         } else {
             "Download started! Tap Downloads icon above to view progress."
@@ -160,6 +170,18 @@ class MainViewModel(
 
     fun cancelDownload(context: Context) {
         repository.cancelDownload(context)
+    }
+
+    fun cancelAllDownloads(context: Context) {
+        repository.cancelAllDownloads(context)
+    }
+
+    fun removeQueuedTask(id: String) {
+        DownloadTracker.removeQueuedTask(id)
+    }
+
+    fun clearQueue() {
+        DownloadTracker.clearQueue()
     }
 
     fun openMedia(context: Context, item: DownloadTaskProgress) {

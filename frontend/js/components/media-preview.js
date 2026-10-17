@@ -69,19 +69,22 @@ export function setDownloadButtonState(state, customText = null) {
   if (state === "ready") {
     store.set("isMediaDownloaded", false);
     btnDownload.disabled = false;
+    const isDownloading = store.get("isDownloading");
     const isPlaylist = currentMedia && currentMedia.is_playlist;
     const selectedCount = document.querySelectorAll(".playlist-checkbox:checked").length;
     const q = qualitySelect ? qualitySelect.value : "best";
-    let defaultText = "Download Now";
+    let defaultText = isDownloading ? "Add to Download Queue" : "Download Now";
     if (isPlaylist) {
       const isBatch = currentMedia && currentMedia.platform === "batch";
       const typeName = isBatch ? "Batch" : "Playlist";
-      defaultText = `Download ${typeName} (${selectedCount} Selected)`;
+      defaultText = isDownloading
+        ? `Queue ${typeName} (${selectedCount} Selected)`
+        : `Download ${typeName} (${selectedCount} Selected)`;
     } else if (currentMedia) {
       const singleItem = (currentMedia.items && currentMedia.items[0]) || currentMedia;
       const singleBytes = getItemSizeForQuality(singleItem, q) || (currentMedia.quality_sizes && currentMedia.quality_sizes[q]) || currentMedia.estimated_filesize || currentMedia.filesize;
       const sizeStr = singleBytes > 0 ? ` • ~${formatBytes(singleBytes)}` : "";
-      defaultText = `Download Video${sizeStr}`;
+      defaultText = isDownloading ? `Add to Download Queue${sizeStr}` : `Download Video${sizeStr}`;
     }
     const text = customText || defaultText;
     btnDownload.innerHTML = `

@@ -1,6 +1,6 @@
 # ⚡ OmniDownloader — Comprehensive Technical Documentation & Architecture Manual
 
-> **Version:** 1.5.0  
+> **Version:** 1.5.1  
 > **Target OS:** Windows 10 / 11 (x64) & Android 7.0+ (ARM64)  
 > **Architecture:** Local-First Micro-Service / Hybrid Desktop Client & Native Android App  
 > **Repository:** [Aniketkumar-01/omni_downloader](https://github.com/Aniketkumar-01/omni_downloader)  
@@ -256,6 +256,10 @@ The frontend is implemented with zero framework dependencies, running natively i
 5. **Settings & Environment Modal**:
    - Allows changing the destination download folder with a single-dialog native folder picker.
    - Displays FFmpeg installation status and 1-click winget installer.
+6. **FIFO Download Queue & Auto-Processor (Cross-Platform)**:
+   - Eliminates blocking when downloading single or playlist media: users can ingest and queue multiple media URLs back-to-back without waiting.
+   - **Android**: `DownloadForegroundService` and `DownloadTracker` manage a persistent FIFO queue in `SharedPreferences`. The active download runs in foreground, and upon completion or failure, the service automatically polls the next item from `DownloadTracker.queue` and streams progress without dropping the foreground service or waking the user.
+   - **Desktop**: Client-side reactive FIFO queue orchestrator (`download-queue.js`) preserves active progress telemetry while permitting immediate queuing of subsequent media URLs. Completing a task dispatches the next queued item sequentially without triggering rate limits or memory exhaustion.
 
 ---
 

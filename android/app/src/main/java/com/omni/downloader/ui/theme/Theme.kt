@@ -3,18 +3,27 @@ package com.omni.downloader.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = AccentTeal,
-    secondary = AccentCyan,
-    tertiary = AccentPurple,
-    background = BgDark,
-    surface = SurfaceDark,
-    onPrimary = BgDark,
+    primary = AccentCobalt,
+    onPrimary = Color.White,
+    primaryContainer = AccentCobaltContainer,
+    onPrimaryContainer = AccentCobaltLight,
+    secondary = TextSecondary,
     onSecondary = BgDark,
-    onTertiary = TextPrimary,
+    tertiary = AccentCobaltLight,
+    onTertiary = BgDark,
+    background = BgDark,
     onBackground = TextPrimary,
-    onSurface = TextPrimary
+    surface = SurfaceDark,
+    onSurface = TextPrimary,
+    surfaceVariant = SurfaceCard,
+    onSurfaceVariant = TextSecondary,
+    outline = BorderSubtle,
+    outlineVariant = BorderMedium,
+    error = StatusError,
+    onError = Color.White
 )
 
 @Composable

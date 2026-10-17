@@ -15,7 +15,7 @@
 - **⏯️ Pause & Resume**: Pause downloads at any time and resume seamlessly without losing progress.
 - **📚 Complete Playlist Downloads**: Download full YouTube playlists in one click with live per-item progress tracking.
 - **📊 Real-Time Estimated Sizes**: Displays accurate file size estimates directly on quality selection chips.
-- **🎨 Sleek Cyber-Obsidian UI**: Built with Jetpack Compose and Material 3, matching the desktop theme.
+- **🎨 Minimal Obsidian & Cobalt UI**: Engineered with Jetpack Compose and Material 3, matching the desktop Obsidian and Electric Cobalt design system.
 
 ---
 

@@ -3,6 +3,7 @@ package com.omni.downloader.data.models
 enum class TaskStatus {
     IDLE,
     FETCHING,
+    QUEUED,
     DOWNLOADING,
     PAUSED,
     MERGING,
@@ -10,6 +11,16 @@ enum class TaskStatus {
     FAILED,
     CANCELLED
 }
+
+data class QueuedDownloadTask(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val url: String,
+    val quality: String,
+    val title: String,
+    val isAudio: Boolean = false,
+    val isPlaylist: Boolean = false,
+    val addedAt: Long = System.currentTimeMillis()
+)
 
 data class DownloadTaskProgress(
     val taskId: String,

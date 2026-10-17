@@ -25,7 +25,7 @@
         </div>
         <div class="brand-text">
           <span class="brand-name">OmniDownloader</span>
-          <span class="app-version-pill" id="app-version-indicator" title="OmniDownloader Version">v1.5.0</span>
+          <span class="app-version-pill" id="app-version-indicator" title="OmniDownloader Version">v1.5.1</span>
           <span class="engine-pill" id="engine-version-indicator" title="yt-dlp Extraction Engine">
             <span class="engine-dot" aria-hidden="true"></span>
             <span id="engine-badge-text">Engine Ready</span>
@@ -400,6 +400,22 @@
           </button>
         </div>
       </section>
+
+      <!-- Download Queue Bay (FIFO Auto-Processing) -->
+      <section id="queue-card" class="telemetry-bay queue-bay" aria-label="Download Queue" style="display: none;">
+        <div class="telemetry-header">
+          <div class="stream-info">
+            <span class="queue-chip">FIFO QUEUE</span>
+            <div id="queue-count-label" class="telemetry-stream-name">Pending Queue (0)</div>
+          </div>
+          <button type="button" id="btn-clear-queue" class="btn-telemetry-action btn-telemetry-cancel" title="Clear all queued items">
+            <span>Clear Queue</span>
+          </button>
+        </div>
+        <div id="queue-items-list" class="queue-items-list">
+          <!-- Dynamically populated queued items -->
+        </div>
+      </section>
     </main>
 
     <!-- Notification Toast Hub -->
@@ -462,7 +478,7 @@
         <div class="version-leap-row">
           <div class="version-badge-box">
             <span class="version-box-label">Installed</span>
-            <span id="update-current-version" class="version-number current">v1.5.0</span>
+            <span id="update-current-version" class="version-number current">v1.5.1</span>
           </div>
           <div class="version-arrow" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -472,7 +488,7 @@
           </div>
           <div class="version-badge-box target">
             <span class="version-box-label">Available</span>
-            <span id="update-target-version" class="version-number target">v1.5.0</span>
+            <span id="update-target-version" class="version-number target">v1.5.1</span>
           </div>
         </div>
 

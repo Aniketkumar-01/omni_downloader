@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_dark">#0A0D14</color>
-    <color name="surface_dark">#121620</color>
-    <color name="surface_card">#171C28</color>
-    <color name="border_subtle">#232A3B</color>
-    <color name="accent_teal">#00F0B5</color>
-    <color name="accent_cyan">#00D2FF</color>
-    <color name="accent_purple">#7928CA</color>
-    <color name="text_primary">#F0F4FC</color>
-    <color name="text_secondary">#8E9AB0</color>
-    <color name="status_error">#FF4D6D</color>
-    <color name="status_success">#00F0B5</color>
+    <color name="bg_dark">#0B0D10</color>
+    <color name="surface_dark">#13161B</color>
+    <color name="surface_card">#171B22</color>
+    <color name="surface_card_hover">#1E232C</color>
+    <color name="surface_input">#0E1014</color>
+    <color name="border_subtle">#262B34</color>
+    <color name="border_medium">#323946</color>
+    <color name="border_focus">#3B82F6</color>
+    <color name="accent_cobalt">#3B82F6</color>
+    <color name="accent_cobalt_hover">#2563EB</color>
+    <color name="accent_cobalt_container">#1A263D</color>
+    <color name="accent_cobalt_light">#93C5FD</color>
+    <color name="text_primary">#F4F4F5</color>
+    <color name="text_secondary">#A1A1AA</color>
+    <color name="text_tertiary">#71717A</color>
+    <color name="status_error">#EF4444</color>
+    <color name="status_success">#10B981</color>
+    <color name="status_warning">#F59E0B</color>
+    <!-- Legacy aliases for backwards compatibility -->
+    <color name="accent_teal">#3B82F6</color>
+    <color name="accent_cyan">#93C5FD</color>
+    <color name="accent_purple">#6366F1</color>
 </resources>

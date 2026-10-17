@@ -16,6 +16,7 @@ import { store } from "../state.js";
 import { showToast } from "./toast.js";
 import { showError } from "./error-alert.js";
 import { formatBytes, setDownloadButtonState } from "./media-preview.js";
+import { pollNextDesktopTask } from "./download-queue.js";
 
 const progressCard = document.getElementById("progress-card");
 const progressItemTitle = document.getElementById("progress-item-title");
@@ -38,6 +39,7 @@ const qualitySelect = document.getElementById("quality-select");
 let activeTracker = null;
 let isPaused = false;
 let restartCallback = null;
+let queuedDownloadCallback = null;
 
 export function hideProgressView() {
   if (progressCard) {
@@ -149,9 +151,20 @@ export function showProgressView(taskId) {
         if (btnPauseDownload) btnPauseDownload.style.display = "none";
       }
 
-      setDownloadButtonState("downloading", `Downloading (${pct.toFixed(0)}%)...`);
+      const currentMedia = store.get("currentMedia");
+      const activeUrl = store.get("activeDownloadUrl");
+      if (!currentMedia || !activeUrl || currentMedia.url === activeUrl) {
+        setDownloadButtonState("downloading", `Downloading (${pct.toFixed(0)}%)...`);
+      }
     },
     onComplete: (data) => {
+      const nextTask = pollNextDesktopTask();
+      if (nextTask && queuedDownloadCallback) {
+        showToast(`Download finished! Starting queued video: ${nextTask.title}`, "info");
+        queuedDownloadCallback(nextTask);
+        return;
+      }
+
       store.set("isDownloading", false);
       store.set("isMediaDownloaded", true);
 
@@ -174,6 +187,13 @@ export function showProgressView(taskId) {
       setDownloadButtonState("completed");
     },
     onCancel: () => {
+      const nextTask = pollNextDesktopTask();
+      if (nextTask && queuedDownloadCallback) {
+        showToast(`Download cancelled. Starting queued: ${nextTask.title}`, "info");
+        queuedDownloadCallback(nextTask);
+        return;
+      }
+
       store.set("isDownloading", false);
       if (btnCancelDownload) btnCancelDownload.style.display = "none";
       if (btnPauseDownload) btnPauseDownload.style.display = "none";
@@ -189,6 +209,14 @@ export function showProgressView(taskId) {
       showToast("Download was cancelled.", "info");
     },
     onError: (err) => {
+      const nextTask = pollNextDesktopTask();
+      if (nextTask && queuedDownloadCallback) {
+        showError(err);
+        showToast(`Attempting next queued video: ${nextTask.title}`, "info");
+        queuedDownloadCallback(nextTask);
+        return;
+      }
+
       store.set("isDownloading", false);
       if (btnCancelDownload) btnCancelDownload.style.display = "none";
       if (btnPauseDownload) btnPauseDownload.style.display = "none";
@@ -232,6 +260,9 @@ export function cancelActiveDownload() {
 export function initDownloadTracker(options = {}) {
   if (options.onRestartDownload) {
     restartCallback = options.onRestartDownload;
+  }
+  if (options.onStartQueuedDownload) {
+    queuedDownloadCallback = options.onStartQueuedDownload;
   }
 
   if (btnPauseDownload) {

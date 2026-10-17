@@ -7,6 +7,7 @@ import com.omni.downloader.data.models.DownloadTaskProgress
 import com.omni.downloader.data.models.TaskStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.omni.downloader.data.models.QueuedDownloadTask
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -15,6 +16,7 @@ object DownloadTracker {
     private const val PREFS_NAME = "omni_download_history"
     private const val KEY_HISTORY = "history_json"
     private const val KEY_ACTIVE_TASK = "active_task_json"
+    private const val KEY_QUEUE = "queue_json"
 
     private var prefs: SharedPreferences? = null
 
@@ -24,11 +26,15 @@ object DownloadTracker {
     private val _history = MutableStateFlow<List<DownloadTaskProgress>>(emptyList())
     val history = _history.asStateFlow()
 
+    private val _queue = MutableStateFlow<List<QueuedDownloadTask>>(emptyList())
+    val queue = _queue.asStateFlow()
+
     fun init(context: Context) {
         if (prefs == null) {
             prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             loadHistory()
             loadActiveTask()
+            loadQueue()
         }
     }
 
@@ -145,5 +151,88 @@ object DownloadTracker {
     fun clearAllHistory() {
         _history.value = emptyList()
         saveHistory()
+    }
+
+    private fun loadQueue() {
+        val jsonStr = prefs?.getString(KEY_QUEUE, null) ?: return
+        try {
+            val jsonArray = JSONArray(jsonStr)
+            val list = mutableListOf<QueuedDownloadTask>()
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                list.add(
+                    QueuedDownloadTask(
+                        id = obj.optString("id", java.util.UUID.randomUUID().toString()),
+                        url = obj.optString("url", ""),
+                        quality = obj.optString("quality", "best"),
+                        title = obj.optString("title", "Media Download"),
+                        isAudio = obj.optBoolean("isAudio", false),
+                        isPlaylist = obj.optBoolean("isPlaylist", false),
+                        addedAt = obj.optLong("addedAt", System.currentTimeMillis())
+                    )
+                )
+            }
+            _queue.value = list
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to load saved queue: ${e.message}")
+        }
+    }
+
+    private fun saveQueue() {
+        val p = prefs ?: return
+        try {
+            val jsonArray = JSONArray()
+            for (item in _queue.value) {
+                val obj = JSONObject().apply {
+                    put("id", item.id)
+                    put("url", item.url)
+                    put("quality", item.quality)
+                    put("title", item.title)
+                    put("isAudio", item.isAudio)
+                    put("isPlaylist", item.isPlaylist)
+                    put("addedAt", item.addedAt)
+                }
+                jsonArray.put(obj)
+            }
+            p.edit().putString(KEY_QUEUE, jsonArray.toString()).apply()
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to persist queue: ${e.message}")
+        }
+    }
+
+    fun enqueueTask(task: QueuedDownloadTask): Int {
+        val current = _queue.value
+        if (current.any { it.url == task.url && it.quality == task.quality }) {
+            return current.indexOfFirst { it.url == task.url && it.quality == task.quality } + 1
+        }
+        val updated = current + task
+        _queue.value = updated
+        saveQueue()
+        return updated.size
+    }
+
+    fun pollNextQueuedTask(): QueuedDownloadTask? {
+        val current = _queue.value
+        if (current.isEmpty()) return null
+        val next = current.first()
+        _queue.value = current.drop(1)
+        saveQueue()
+        return next
+    }
+
+    fun removeQueuedTask(id: String): Boolean {
+        val current = _queue.value
+        val updated = current.filter { it.id != id }
+        val changed = updated.size != current.size
+        if (changed) {
+            _queue.value = updated
+            saveQueue()
+        }
+        return changed
+    }
+
+    fun clearQueue() {
+        _queue.value = emptyList()
+        saveQueue()
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,11 +34,13 @@ fun MediaPreviewCard(
     selectedPlaylistCount: Int,
     onQualitySelect: (String) -> Unit,
     onDownloadClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasActiveDownload: Boolean = false
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        border = BorderStroke(1.dp, BorderSubtle),
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -88,7 +91,7 @@ fun MediaPreviewCard(
             Text(
                 "${meta.channel ?: "Unknown"} • ${meta.platform}",
                 fontSize = 13.sp,
-                color = AccentCyan
+                color = AccentCobaltLight
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -125,13 +128,13 @@ fun MediaPreviewCard(
                                 val sizeBadge = quality.estimatedSizeFormatted ?: "~45 MB"
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Surface(
-                                    color = if (isSelected) BgDark.copy(alpha = 0.25f) else AccentTeal.copy(alpha = 0.18f),
+                                    color = if (isSelected) Color.White.copy(alpha = 0.2f) else AccentCobaltContainer,
                                     shape = RoundedCornerShape(4.dp)
                                 ) {
                                     Text(
                                         text = sizeBadge,
                                         fontSize = 10.sp,
-                                        color = if (isSelected) BgDark else AccentTeal,
+                                        color = if (isSelected) Color.White else AccentCobaltLight,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                                     )
@@ -139,10 +142,16 @@ fun MediaPreviewCard(
                             }
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = AccentTeal,
-                            selectedLabelColor = BgDark,
+                            selectedContainerColor = AccentCobalt,
+                            selectedLabelColor = Color.White,
                             containerColor = SurfaceCard,
                             labelColor = TextPrimary
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = isSelected,
+                            borderColor = BorderSubtle,
+                            selectedBorderColor = AccentCobalt
                         )
                     )
                 }
@@ -155,8 +164,8 @@ fun MediaPreviewCard(
             Spacer(modifier = Modifier.height(10.dp))
             Surface(
                 color = SurfaceCard,
-                shape = RoundedCornerShape(10.dp),
-                border = BorderStroke(1.dp, AccentTeal.copy(alpha = 0.35f)),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, BorderSubtle),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -166,7 +175,7 @@ fun MediaPreviewCard(
                     Icon(
                         Icons.Default.Info,
                         contentDescription = null,
-                        tint = AccentTeal,
+                        tint = AccentCobalt,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -183,7 +192,7 @@ fun MediaPreviewCard(
                             displaySize
                         },
                         fontSize = 12.sp,
-                        color = AccentTeal,
+                        color = AccentCobaltLight,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -193,8 +202,9 @@ fun MediaPreviewCard(
             if (meta.isPlaylist) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Surface(
-                    color = AccentTeal.copy(alpha = 0.12f),
+                    color = AccentCobaltContainer,
                     shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, AccentCobalt.copy(alpha = 0.3f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -204,7 +214,7 @@ fun MediaPreviewCard(
                         Icon(
                             Icons.Default.PlaylistPlay,
                             contentDescription = null,
-                            tint = AccentTeal,
+                            tint = AccentCobaltLight,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -216,7 +226,7 @@ fun MediaPreviewCard(
                         }
                         Text(
                             playlistText,
-                            color = AccentTeal,
+                            color = AccentCobaltLight,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -230,6 +240,11 @@ fun MediaPreviewCard(
             val isPlaylist = meta.isPlaylist
             val hasItems = meta.playlistItems.isNotEmpty()
             val downloadBtnText = when {
+                hasActiveDownload && isPlaylist && hasItems && selectedPlaylistCount == meta.playlistItems.size -> "Queue All (${selectedPlaylistCount} Videos)"
+                hasActiveDownload && isPlaylist && hasItems && selectedPlaylistCount > 0 -> "Queue Selected (${selectedPlaylistCount} Videos)"
+                hasActiveDownload && isPlaylist && hasItems && selectedPlaylistCount == 0 -> "Select at least 1 video"
+                hasActiveDownload && isPlaylist -> "Queue Entire Playlist"
+                hasActiveDownload -> "Add to Download Queue"
                 isPlaylist && hasItems && selectedPlaylistCount == meta.playlistItems.size -> "Download All (${selectedPlaylistCount} Videos)"
                 isPlaylist && hasItems && selectedPlaylistCount > 0 -> "Download Selected (${selectedPlaylistCount} Videos)"
                 isPlaylist && hasItems && selectedPlaylistCount == 0 -> "Select at least 1 video"
@@ -241,10 +256,10 @@ fun MediaPreviewCard(
             Button(
                 onClick = onDownloadClick,
                 enabled = isDownloadEnabled,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = AccentTeal,
-                    disabledContainerColor = BorderSubtle
+                    containerColor = AccentCobalt,
+                    disabledContainerColor = SurfaceCard
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -253,14 +268,14 @@ fun MediaPreviewCard(
                 Icon(
                     if (meta.isPlaylist) Icons.Default.PlaylistPlay else Icons.Default.Download,
                     contentDescription = null,
-                    tint = BgDark
+                    tint = if (isDownloadEnabled) Color.White else TextTertiary
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     downloadBtnText,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isDownloadEnabled) BgDark else TextSecondary
+                    color = if (isDownloadEnabled) Color.White else TextTertiary
                 )
             }
         }

@@ -1,6 +1,7 @@
 package com.omni.downloader.ui.components
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -50,7 +51,7 @@ fun AppUpdateDialog(
                 Icon(
                     if (updateInfo.isUpdateAvailable) Icons.Default.SystemUpdate else Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = if (updateInfo.isUpdateAvailable) AccentTeal else StatusSuccess
+                    tint = if (updateInfo.isUpdateAvailable) AccentCobalt else StatusSuccess
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -66,7 +67,7 @@ fun AppUpdateDialog(
                 Text(
                     "Installed: v${updateInfo.currentVersion} • Latest: v${updateInfo.latestVersion}",
                     fontSize = 12.sp,
-                    color = AccentCyan,
+                    color = AccentCobaltLight,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -74,11 +75,11 @@ fun AppUpdateDialog(
                 if (updateInfo.isUpdateAvailable) {
                     // Important guidance notice on uninstalling prior to update
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF281F12)),
+                        colors = CardDefaults.cardColors(containerColor = StatusWarningContainer),
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .border(1.dp, Color(0xFFE5A100).copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                            .border(1.dp, StatusWarning.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
                     ) {
                         Row(
                             modifier = Modifier.padding(10.dp),
@@ -87,7 +88,7 @@ fun AppUpdateDialog(
                             Icon(
                                 Icons.Default.WarningAmber,
                                 contentDescription = null,
-                                tint = Color(0xFFFFB74D),
+                                tint = StatusWarning,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -96,7 +97,7 @@ fun AppUpdateDialog(
                                     "Important Installation Step",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFFB74D)
+                                    color = StatusWarning
                                 )
                                 Spacer(modifier = Modifier.height(3.dp))
                                 Text(
@@ -120,6 +121,7 @@ fun AppUpdateDialog(
                     Spacer(modifier = Modifier.height(4.dp))
                     Card(
                         colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                        border = BorderStroke(1.dp, BorderSubtle),
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -137,6 +139,7 @@ fun AppUpdateDialog(
                     // Download Link presentation with copy button
                     Card(
                         colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                        border = BorderStroke(1.dp, BorderSubtle),
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -156,7 +159,7 @@ fun AppUpdateDialog(
                                 Text(
                                     targetDownloadUrl,
                                     fontSize = 11.sp,
-                                    color = AccentCyan,
+                                    color = AccentCobaltLight,
                                     maxLines = 1
                                 )
                             }
@@ -170,7 +173,7 @@ fun AppUpdateDialog(
                                 Icon(
                                     Icons.Default.ContentCopy,
                                     contentDescription = "Copy Link",
-                                    tint = AccentTeal,
+                                    tint = AccentCobalt,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -189,23 +192,23 @@ fun AppUpdateDialog(
             if (updateInfo.isUpdateAvailable) {
                 Button(
                     onClick = { onOpenDownloadLink(targetDownloadUrl) },
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentTeal)
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentCobalt)
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.OpenInNew,
                         contentDescription = null,
-                        tint = BgDark,
+                        tint = Color.White,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Download Update", color = BgDark, fontWeight = FontWeight.Bold)
+                    Text("Download Update", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Button(
                     onClick = onUpdateCoreEngine,
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentCyan)
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentCobalt)
                 ) {
-                    Text("Update yt-dlp Core", color = BgDark, fontWeight = FontWeight.Bold)
+                    Text("Update yt-dlp Core", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
         },

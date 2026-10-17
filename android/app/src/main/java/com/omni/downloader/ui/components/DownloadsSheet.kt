@@ -13,28 +13,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omni.downloader.data.models.DownloadTaskProgress
+import com.omni.downloader.data.models.QueuedDownloadTask
 import com.omni.downloader.data.models.TaskStatus
 import com.omni.downloader.data.models.isAudioMedia
 import com.omni.downloader.ui.theme.*
 
 /**
  * Reusable Bottom Sheet component for the Downloads Center:
- * Real-time active progress gauge and clickable completed history with system chooser media launch.
+ * Real-time active progress gauge, queued FIFO downloads, and clickable completed history.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadsSheet(
     activeDownload: DownloadTaskProgress?,
+    queuedTasks: List<QueuedDownloadTask> = emptyList(),
     downloadHistory: List<DownloadTaskProgress>,
     onDismiss: () -> Unit,
     onPauseDownload: () -> Unit,
     onResumeDownload: () -> Unit,
     onCancelDownload: () -> Unit,
+    onRemoveQueued: (String) -> Unit = {},
+    onClearQueue: () -> Unit = {},
     onOpenMedia: (DownloadTaskProgress) -> Unit,
     onRemoveHistoryItem: (String) -> Unit,
     onClearHistory: () -> Unit,
@@ -58,7 +63,7 @@ fun DownloadsSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Download, contentDescription = null, tint = AccentTeal)
+                    Icon(Icons.Default.Download, contentDescription = null, tint = AccentCobalt)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Downloads Center",
@@ -80,6 +85,7 @@ fun DownloadsSheet(
                 Card(
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                    border = BorderStroke(1.dp, BorderSubtle),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
@@ -99,12 +105,12 @@ fun DownloadsSheet(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Surface(
-                                color = if (isPaused) AccentCyan.copy(alpha = 0.2f) else AccentTeal.copy(alpha = 0.2f),
+                                color = if (isPaused) StatusWarningContainer else AccentCobaltContainer,
                                 shape = RoundedCornerShape(6.dp)
                             ) {
                                 Text(
                                     if (isPaused) "PAUSED" else "DOWNLOADING",
-                                    color = if (isPaused) AccentCyan else AccentTeal,
+                                    color = if (isPaused) StatusWarning else AccentCobaltLight,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -120,7 +126,7 @@ fun DownloadsSheet(
                                 .fillMaxWidth()
                                 .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp)),
-                            color = if (isPaused) AccentCyan else AccentTeal,
+                            color = if (isPaused) StatusWarning else AccentCobalt,
                             trackColor = BorderSubtle
                         )
 
@@ -139,7 +145,7 @@ fun DownloadsSheet(
                             Text(
                                 if (task.etaFormatted.isNotBlank()) "ETA: ${task.etaFormatted}" else "",
                                 fontSize = 11.sp,
-                                color = AccentCyan
+                                color = AccentCobaltLight
                             )
                         }
 
@@ -152,7 +158,7 @@ fun DownloadsSheet(
                             if (isPaused) {
                                 Button(
                                     onClick = onResumeDownload,
-                                    colors = ButtonDefaults.buttonColors(containerColor = AccentTeal),
+                                    colors = ButtonDefaults.buttonColors(containerColor = AccentCobalt),
                                     shape = RoundedCornerShape(8.dp),
                                     modifier = Modifier
                                         .weight(1f)
@@ -161,25 +167,25 @@ fun DownloadsSheet(
                                     Icon(
                                         Icons.Default.PlayArrow,
                                         contentDescription = null,
-                                        tint = BgDark,
+                                        tint = Color.White,
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Resume", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BgDark)
+                                    Text("Resume", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                                 }
                             } else {
                                 OutlinedButton(
                                     onClick = onPauseDownload,
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AccentCyan),
-                                    border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.6f)),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
+                                    border = BorderStroke(1.dp, BorderSubtle),
                                     shape = RoundedCornerShape(8.dp),
                                     modifier = Modifier
                                         .weight(1f)
                                         .height(38.dp)
                                 ) {
-                                    Icon(Icons.Default.Pause, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Pause, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Pause", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text("Pause", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                                 }
                             }
 
@@ -191,14 +197,135 @@ fun DownloadsSheet(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(38.dp)
-                                ) {
-                                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Cancel", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                }
+                            ) {
+                                Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Cancel", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(14.dp))
+            }
+
+            // Queued Downloads Section
+            if (queuedTasks.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            "Download Queue (${queuedTasks.size})",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextSecondary
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                            color = AccentCobaltContainer,
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
+                            Text(
+                                "AUTO-FIFO",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AccentCobaltLight,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
+                    }
+                    TextButton(onClick = onClearQueue) {
+                        Text("Clear Queue", fontSize = 11.sp, color = StatusError.copy(alpha = 0.8f))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    queuedTasks.forEachIndexed { index, queuedItem ->
+                        Card(
+                            shape = RoundedCornerShape(10.dp),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                            border = BorderStroke(1.dp, BorderSubtle),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    // Queue position badge
+                                    Surface(
+                                        color = SurfaceInput,
+                                        shape = RoundedCornerShape(6.dp),
+                                        border = BorderStroke(1.dp, BorderSubtle)
+                                    ) {
+                                        Text(
+                                            "#${index + 1}",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = AccentCobaltLight,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.width(10.dp))
+
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            queuedItem.title.ifBlank { queuedItem.url },
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = TextPrimary,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                if (queuedItem.isAudio) "Audio (MP3)" else queuedItem.quality,
+                                                fontSize = 11.sp,
+                                                color = TextSecondary
+                                            )
+                                            if (queuedItem.isPlaylist) {
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    "• Playlist",
+                                                    fontSize = 11.sp,
+                                                    color = AccentCobaltLight
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                IconButton(
+                                    onClick = { onRemoveQueued(queuedItem.id) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = "Remove from Queue",
+                                        tint = TextSecondary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(14.dp))
             }
 
@@ -216,14 +343,14 @@ fun DownloadsSheet(
                 )
                 if (downloadHistory.isNotEmpty()) {
                     TextButton(onClick = onClearHistory) {
-                        Text("Clear All", fontSize = 11.sp, color = AccentCyan)
+                        Text("Clear All", fontSize = 11.sp, color = AccentCobaltLight)
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (activeDownload == null && downloadHistory.isEmpty()) {
+            if (activeDownload == null && queuedTasks.isEmpty() && downloadHistory.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -253,8 +380,9 @@ fun DownloadsSheet(
                         val isAudio = historyItem.isAudioMedia
 
                         Card(
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(10.dp),
                             colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                            border = BorderStroke(1.dp, BorderSubtle),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .then(
@@ -272,9 +400,9 @@ fun DownloadsSheet(
                                 Surface(
                                     shape = RoundedCornerShape(8.dp),
                                     color = when {
-                                        !isCompleted -> StatusError.copy(alpha = 0.15f)
-                                        isAudio -> AccentTeal.copy(alpha = 0.15f)
-                                        else -> AccentCyan.copy(alpha = 0.15f)
+                                        !isCompleted -> StatusErrorContainer
+                                        isAudio -> AccentCobaltContainer
+                                        else -> Color(0x1F3B82F6)
                                     },
                                     modifier = Modifier.size(36.dp)
                                 ) {
@@ -288,8 +416,8 @@ fun DownloadsSheet(
                                             contentDescription = if (isAudio) "Audio" else "Video",
                                             tint = when {
                                                 !isCompleted -> StatusError
-                                                isAudio -> AccentTeal
-                                                else -> AccentCyan
+                                                isAudio -> AccentCobaltLight
+                                                else -> AccentCobalt
                                             },
                                             modifier = Modifier.size(18.dp)
                                         )
@@ -312,13 +440,13 @@ fun DownloadsSheet(
                                         if (isCompleted) {
                                             Surface(
                                                 shape = RoundedCornerShape(4.dp),
-                                                color = if (isAudio) AccentTeal.copy(alpha = 0.2f) else AccentCyan.copy(alpha = 0.2f)
+                                                color = if (isAudio) AccentCobaltContainer else Color(0x1F3B82F6)
                                             ) {
                                                 Text(
                                                     if (isAudio) "AUDIO" else "VIDEO",
                                                     fontSize = 9.sp,
                                                     fontWeight = FontWeight.Bold,
-                                                    color = if (isAudio) AccentTeal else AccentCyan,
+                                                    color = if (isAudio) AccentCobaltLight else AccentCobalt,
                                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                                                 )
                                             }
@@ -348,7 +476,7 @@ fun DownloadsSheet(
                                     Button(
                                         onClick = { onOpenMedia(historyItem) },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (isAudio) AccentTeal else AccentCyan
+                                            containerColor = AccentCobalt
                                         ),
                                         shape = RoundedCornerShape(8.dp),
                                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
@@ -357,7 +485,7 @@ fun DownloadsSheet(
                                         Icon(
                                             imageVector = if (isAudio) Icons.Default.PlayArrow else Icons.Default.OpenInNew,
                                             contentDescription = null,
-                                            tint = BgDark,
+                                            tint = Color.White,
                                             modifier = Modifier.size(13.dp)
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
@@ -365,7 +493,7 @@ fun DownloadsSheet(
                                             if (isAudio) "Play" else "Open",
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = BgDark
+                                            color = Color.White
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(2.dp))

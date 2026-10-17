@@ -13,6 +13,7 @@ import com.omni.downloader.MainActivity
 import com.omni.downloader.OmniApplication
 import com.omni.downloader.data.DownloadTracker
 import com.omni.downloader.data.models.DownloadTaskProgress
+import com.omni.downloader.data.models.QueuedDownloadTask
 import com.omni.downloader.data.models.TaskStatus
 import com.omni.downloader.engine.StorageHelper
 import com.omni.downloader.engine.YoutubeDLEngine
@@ -44,12 +45,15 @@ class DownloadForegroundService : Service() {
         const val ACTION_PAUSE = "ACTION_PAUSE_DOWNLOAD"
         const val ACTION_RESUME = "ACTION_RESUME_DOWNLOAD"
         const val ACTION_CANCEL = "ACTION_CANCEL_DOWNLOAD"
+        const val ACTION_CANCEL_ALL = "ACTION_CANCEL_ALL_DOWNLOADS"
+        const val ACTION_REMOVE_QUEUED = "ACTION_REMOVE_QUEUED_DOWNLOAD"
 
         const val EXTRA_URL = "EXTRA_URL"
         const val EXTRA_QUALITY = "EXTRA_QUALITY"
         const val EXTRA_TITLE = "EXTRA_TITLE"
         const val EXTRA_IS_AUDIO = "EXTRA_IS_AUDIO"
         const val EXTRA_IS_PLAYLIST = "EXTRA_IS_PLAYLIST"
+        const val EXTRA_TASK_ID = "EXTRA_TASK_ID"
 
         private const val TAG = "DownloadService"
 
@@ -92,6 +96,21 @@ class DownloadForegroundService : Service() {
             }
             context.startService(intent)
         }
+
+        fun removeQueuedDownload(context: Context, taskId: String) {
+            val intent = Intent(context, DownloadForegroundService::class.java).apply {
+                action = ACTION_REMOVE_QUEUED
+                putExtra(EXTRA_TASK_ID, taskId)
+            }
+            context.startService(intent)
+        }
+
+        fun cancelAllDownloads(context: Context) {
+            val intent = Intent(context, DownloadForegroundService::class.java).apply {
+                action = ACTION_CANCEL_ALL
+            }
+            context.startService(intent)
+        }
     }
 
     override fun onCreate() {
@@ -111,33 +130,28 @@ class DownloadForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> {
-                activeUrl = intent.getStringExtra(EXTRA_URL) ?: return START_STICKY
-                activeQuality = intent.getStringExtra(EXTRA_QUALITY) ?: "best"
-                activeTitle = intent.getStringExtra(EXTRA_TITLE) ?: "Media Download"
-                activeIsAudio = intent.getBooleanExtra(EXTRA_IS_AUDIO, false)
-                activeIsPlaylist = intent.getBooleanExtra(EXTRA_IS_PLAYLIST, false)
+                val url = intent.getStringExtra(EXTRA_URL) ?: return START_STICKY
+                val quality = intent.getStringExtra(EXTRA_QUALITY) ?: "best"
+                val title = intent.getStringExtra(EXTRA_TITLE) ?: "Media Download"
+                val isAudio = intent.getBooleanExtra(EXTRA_IS_AUDIO, false)
+                val isPlaylist = intent.getBooleanExtra(EXTRA_IS_PLAYLIST, false)
 
-                val urlHash = kotlin.math.abs(activeUrl.hashCode()).toString(16)
-                activeTaskId = "dl_$urlHash"
-                isPaused = false
-                isCancelled = false
-                lastProgressEmitTime = 0L
-                playlistCompleted = 0
-                playlistTotal = 1
-
-                DownloadTracker.updateProgress(
-                    DownloadTaskProgress(
-                        taskId = activeTaskId,
-                        status = TaskStatus.DOWNLOADING,
-                        progressPercent = 0f,
-                        currentTitle = activeTitle,
-                        totalItems = if (activeIsPlaylist) 0 else 1,
-                        isAudio = activeIsAudio
+                // If currently downloading or paused with an active URL, queue this new request
+                val isBusy = (downloadJob?.isActive == true || isPaused) && activeUrl.isNotBlank()
+                if (isBusy) {
+                    val queuedTask = QueuedDownloadTask(
+                        url = url,
+                        quality = quality,
+                        title = title,
+                        isAudio = isAudio,
+                        isPlaylist = isPlaylist
                     )
-                )
+                    val queuePos = DownloadTracker.enqueueTask(queuedTask)
+                    Log.d(TAG, "Download busy ($activeTitle). Enqueued task: $title at position #$queuePos")
+                    return START_STICKY
+                }
 
-                startForeground(NOTIFICATION_ID, buildProgressNotification(activeTitle, 0f, "Starting download..."))
-                runDownload()
+                startDownloadTask(url, quality, title, isAudio, isPlaylist)
             }
 
             ACTION_PAUSE -> {
@@ -201,10 +215,45 @@ class DownloadForegroundService : Service() {
                         isAudio = activeIsAudio
                     )
                 )
+                processNextInQueueOrStop()
+            }
+
+            ACTION_CANCEL_ALL -> {
+                DownloadTracker.clearQueue()
+                isCancelled = true
+                isPaused = false
+                YoutubeDLEngine.cancelProcess(activeTaskId)
+                downloadJob?.cancel()
+
+                try {
+                    val taskTempDir = java.io.File(StorageHelper.getTempDownloadDir(this), activeTaskId)
+                    if (taskTempDir.exists()) {
+                        taskTempDir.deleteRecursively()
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Temp dir cleanup on cancel all: ${e.message}")
+                }
+
+                DownloadTracker.updateProgress(
+                    DownloadTaskProgress(
+                        taskId = activeTaskId,
+                        status = TaskStatus.CANCELLED,
+                        currentTitle = activeTitle,
+                        errorMessage = "Cancelled by user",
+                        isAudio = activeIsAudio
+                    )
+                )
                 val notificationManager = getSystemService(NotificationManager::class.java)
                 notificationManager?.cancel(NOTIFICATION_ID)
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
+            }
+
+            ACTION_REMOVE_QUEUED -> {
+                val taskId = intent.getStringExtra(EXTRA_TASK_ID)
+                if (taskId != null) {
+                    DownloadTracker.removeQueuedTask(taskId)
+                }
             }
         }
         return START_STICKY
@@ -306,8 +355,7 @@ class DownloadForegroundService : Service() {
                     )
                 )
                 showCompleteNotification(activeTitle, savedCount, lastSavedUri)
-                stopForeground(STOP_FOREGROUND_DETACH)
-                stopSelf()
+                processNextInQueueOrStop()
             }.onFailure { error ->
                 if (isPaused) {
                     Log.d(TAG, "Download paused intentionally for task $activeTaskId")
@@ -333,10 +381,66 @@ class DownloadForegroundService : Service() {
                         )
                     )
                     showFailedNotification(activeTitle, error.message ?: "Download encountered an error")
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                    stopSelf()
+                    processNextInQueueOrStop()
                 }
             }
+        }
+    }
+
+    private fun startDownloadTask(
+        url: String,
+        quality: String,
+        title: String,
+        isAudio: Boolean,
+        isPlaylist: Boolean
+    ) {
+        activeUrl = url
+        activeQuality = quality
+        activeTitle = title
+        activeIsAudio = isAudio
+        activeIsPlaylist = isPlaylist
+
+        val urlHash = kotlin.math.abs(activeUrl.hashCode()).toString(16)
+        activeTaskId = "dl_$urlHash"
+        isPaused = false
+        isCancelled = false
+        lastProgressEmitTime = 0L
+        playlistCompleted = 0
+        playlistTotal = 1
+
+        DownloadTracker.updateProgress(
+            DownloadTaskProgress(
+                taskId = activeTaskId,
+                status = TaskStatus.DOWNLOADING,
+                progressPercent = 0f,
+                currentTitle = activeTitle,
+                totalItems = if (activeIsPlaylist) 0 else 1,
+                isAudio = activeIsAudio
+            )
+        )
+
+        startForeground(NOTIFICATION_ID, buildProgressNotification(activeTitle, 0f, "Starting download..."))
+        downloadJob?.cancel()
+        runDownload()
+    }
+
+    private fun processNextInQueueOrStop() {
+        val nextTask = DownloadTracker.pollNextQueuedTask()
+        if (nextTask != null) {
+            Log.d(TAG, "Queue has pending items. Starting next task: ${nextTask.title} (${nextTask.url})")
+            startDownloadTask(
+                url = nextTask.url,
+                quality = nextTask.quality,
+                title = nextTask.title,
+                isAudio = nextTask.isAudio,
+                isPlaylist = nextTask.isPlaylist
+            )
+        } else {
+            Log.d(TAG, "Download queue empty. Detaching and stopping foreground service.")
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.cancel(NOTIFICATION_ID)
+            stopForeground(STOP_FOREGROUND_DETACH)
+            stopSelf()
         }
     }
 
@@ -427,7 +531,8 @@ class DownloadForegroundService : Service() {
             )
         }
 
-        notificationManager?.notify(NOTIFICATION_ID + 1, builder.build())
+        val notifId = NOTIFICATION_ID + 10 + (kotlin.math.abs(activeTaskId.hashCode()) % 1000)
+        notificationManager?.notify(notifId, builder.build())
     }
 
     private fun showFailedNotification(title: String, error: String) {
@@ -438,7 +543,8 @@ class DownloadForegroundService : Service() {
             .setSmallIcon(android.R.drawable.stat_notify_error)
             .setAutoCancel(true)
             .build()
-        notificationManager?.notify(NOTIFICATION_ID + 2, notif)
+        val notifId = NOTIFICATION_ID + 2000 + (kotlin.math.abs(activeTaskId.hashCode()) % 1000)
+        notificationManager?.notify(notifId, notif)
     }
 
     private fun getLaunchIntent(): PendingIntent {
