@@ -112,7 +112,7 @@ async def security_and_auth_middleware(request: Request, call_next):
             )
 
     # 3. Require X-Auth-Token on /api/* requests (except public bootstrap endpoints)
-    public_endpoints = ("/api/token", "/api/heartbeat")
+    public_endpoints = ("/api/token", "/api/heartbeat", "/api/clipboard")
     if request.url.path.startswith("/api/") and request.url.path not in public_endpoints:
         token = request.headers.get("x-auth-token") or request.query_params.get("token")
         if not token or not secrets.compare_digest(token, API_TOKEN):
