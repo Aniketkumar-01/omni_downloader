@@ -268,7 +268,7 @@ private fun PlatformChip(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(vertical = 8.dp, horizontal = 4.dp),
-            horizontalAlignment = Alignment.CenterVertically,
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             if (platform.iconResId != null) {

@@ -1,5 +1,5 @@
-Fix(android): Replace Kotlin 2.0 unnamed catch parameter with standard catch (e: Exception)
+Fix(android): Use Alignment.CenterHorizontally for Column in PlatformChip
 
-- Kotlin 1.9.24 does not support unnamed catch variables `catch (_: Exception)`
-- Replaced with `catch (e: Exception)` in loadActiveTask and loadHistory in DownloadTracker.kt
-- Fixes GitHub Actions Android APK build failure in run #62
+- Fix type mismatch: inferred Alignment.Vertical but Alignment.Horizontal was expected
+- Replace Alignment.CenterVertically with Alignment.CenterHorizontally in SupportedPlatformsCard.kt
+- Fixes GitHub Actions Android APK build failure in :app:compileDebugKotlin
