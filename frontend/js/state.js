@@ -16,7 +16,7 @@ class AppStore {
       isMediaDownloaded: false,
       downloadDir: "",
       engineVersion: "",
-      appVersion: "1.4.9",
+      appVersion: "1.5.0",
       cookiesInstalled: false,
       cookieBrowser: "none"
     };

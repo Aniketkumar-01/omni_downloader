@@ -24,7 +24,7 @@ data class AppUpdateInfo(
 
 object UpdateManager {
     private const val TAG = "UpdateManager"
-    const val CURRENT_APP_VERSION = "1.4.9"
+    const val CURRENT_APP_VERSION = "1.5.0"
     private const val GITHUB_API_URL = "https://api.github.com/repos/Aniketkumar-01/omni_downloader/releases/latest"
     const val FALLBACK_RELEASE_URL = "https://github.com/Aniketkumar-01/omni_downloader/releases/latest"
 

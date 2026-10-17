@@ -1,6 +1,6 @@
 # ⚡ OmniDownloader — Comprehensive Technical Documentation & Architecture Manual
 
-> **Version:** 1.4.9  
+> **Version:** 1.5.0  
 > **Target OS:** Windows 10 / 11 (x64) & Android 7.0+ (ARM64)  
 > **Architecture:** Local-First Micro-Service / Hybrid Desktop Client & Native Android App  
 > **Repository:** [Aniketkumar-01/omni_downloader](https://github.com/Aniketkumar-01/omni_downloader)  

@@ -206,7 +206,7 @@ if str(ENGINE_DIR) not in sys.path:
     sys.path.insert(0, str(ENGINE_DIR))
 
 # Application Version and Remote Update Settings
-APP_VERSION = os.getenv("APP_VERSION", "1.4.9")
+APP_VERSION = os.getenv("APP_VERSION", "1.5.0")
 GITHUB_REPO = os.getenv("GITHUB_REPO", "Aniketkumar-01/omni_downloader")
 UPDATES_DIR = USER_DATA_DIR / "updates"
 UPDATES_DIR.mkdir(parents=True, exist_ok=True)
