@@ -47,7 +47,41 @@ export function hideProgressView() {
   }
 }
 
-export function showProgressView(taskId) {
+export function prepareQueuedProgressView(task) {
+  if (!progressCard) return;
+
+  progressCard.style.display = "block";
+  if (progressActions) progressActions.style.display = "none";
+  if (progressPercentage) progressPercentage.textContent = "0%";
+  if (progressBarFill) {
+    progressBarFill.style.width = "0%";
+    progressBarFill.style.background = "var(--accent-primary)";
+  }
+  if (progressSpeed) progressSpeed.textContent = "Speed: Starting...";
+  if (progressEta) progressEta.textContent = "ETA: --";
+  if (progressItemTitle) {
+    progressItemTitle.textContent = (task && task.title) ? task.title : "Starting queued download...";
+  }
+  if (progressSize) {
+    progressSize.textContent = "Size: Calculating...";
+  }
+
+  isPaused = false;
+  if (btnPauseDownload) {
+    btnPauseDownload.style.display = "inline-flex";
+    btnPauseDownload.classList.remove("is-paused");
+    if (btnPauseText) btnPauseText.textContent = "Pause";
+    if (iconPause) iconPause.style.display = "inline";
+    if (iconResume) iconResume.style.display = "none";
+  }
+
+  if (btnCancelDownload) {
+    btnCancelDownload.style.display = "inline-flex";
+    btnCancelDownload.disabled = false;
+  }
+}
+
+export function showProgressView(taskId, queuedTask = null) {
   if (!progressCard) return;
 
   store.set("currentTaskId", taskId);
@@ -62,12 +96,14 @@ export function showProgressView(taskId) {
   }
   if (progressSpeed) progressSpeed.textContent = "Speed: Calculating...";
   if (progressEta) progressEta.textContent = "ETA: --";
-  if (progressItemTitle) progressItemTitle.textContent = "Initializing download...";
+  if (progressItemTitle) {
+    progressItemTitle.textContent = (queuedTask && queuedTask.title) ? queuedTask.title : "Initializing download...";
+  }
 
   const currentMedia = store.get("currentMedia");
-  const selectedQuality = qualitySelect ? qualitySelect.value : "best";
-  const lockedTotalFormatted = (currentMedia && currentMedia.quality_sizes_formatted && currentMedia.quality_sizes_formatted[selectedQuality])
-    || (currentMedia && currentMedia.filesize_formatted)
+  const selectedQuality = (queuedTask && queuedTask.quality) || (qualitySelect ? qualitySelect.value : "best");
+  const lockedTotalFormatted = (!queuedTask && currentMedia && currentMedia.quality_sizes_formatted && currentMedia.quality_sizes_formatted[selectedQuality])
+    || (!queuedTask && currentMedia && currentMedia.filesize_formatted)
     || null;
 
   if (progressSize) {
@@ -237,8 +273,24 @@ export function cancelActiveDownload() {
 
   if (activeTracker) {
     activeTracker.close();
+    activeTracker = null;
   }
 
+  // Request backend cancellation
+  cancelTask(currentTaskId).catch(err => {
+    console.warn("Cancel request notice:", err);
+  });
+
+  // Check FIFO queue: if pending tasks exist, immediately start the next one
+  const nextTask = pollNextDesktopTask();
+  if (nextTask && queuedDownloadCallback) {
+    showToast(`Download cancelled. Starting queued video: ${nextTask.title}`, "info");
+    queuedDownloadCallback(nextTask);
+    return;
+  }
+
+  // No pending items left in queue: clean up download state
+  store.set("isDownloading", false);
   if (btnCancelDownload) btnCancelDownload.style.display = "none";
   if (btnPauseDownload) btnPauseDownload.style.display = "none";
   if (progressBarFill) {
@@ -250,11 +302,7 @@ export function cancelActiveDownload() {
   if (progressEta) progressEta.textContent = "ETA: --";
   if (progressItemTitle) progressItemTitle.textContent = "Download was cancelled.";
   setDownloadButtonState("ready");
-  showToast("Download cancelled.", "info");
-
-  cancelTask(currentTaskId).catch(err => {
-    console.warn("Cancel request notice:", err);
-  });
+  showToast("Download was cancelled.", "info");
 }
 
 export function initDownloadTracker(options = {}) {

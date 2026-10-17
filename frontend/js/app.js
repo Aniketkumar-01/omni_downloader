@@ -30,6 +30,7 @@ import {
 import { 
   showProgressView, 
   hideProgressView, 
+  prepareQueuedProgressView,
   initDownloadTracker 
 } from "./components/download-tracker.js";
 import { 
@@ -198,6 +199,10 @@ async function handleUrlSubmission(e) {
 async function startQueuedTask(task) {
   clearError();
   store.set("activeDownloadUrl", task.url);
+  store.set("isDownloading", true);
+  setDownloadButtonState("downloading", "Starting queued video...");
+  prepareQueuedProgressView(task);
+
   try {
     const res = await startDownload({
       url: task.url,
@@ -208,7 +213,7 @@ async function startQueuedTask(task) {
       quality: task.quality,
       downloadDir: task.downloadDir || null,
     });
-    showProgressView(res.task_id);
+    showProgressView(res.task_id, task);
   } catch (err) {
     showError(err);
     store.set("isDownloading", false);

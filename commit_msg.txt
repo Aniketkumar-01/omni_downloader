@@ -1,5 +1,6 @@
-Fix(android): Use Alignment.CenterHorizontally for Column in PlatformChip
+Fix(desktop): Auto-dispatch next FIFO queued video when cancelling active download
 
-- Fix type mismatch: inferred Alignment.Vertical but Alignment.Horizontal was expected
-- Replace Alignment.CenterVertically with Alignment.CenterHorizontally in SupportedPlatformsCard.kt
-- Fixes GitHub Actions Android APK build failure in :app:compileDebugKotlin
+- Ensure cancelActiveDownload polls and triggers the next queued task via pollNextDesktopTask()
+- Export and invoke prepareQueuedProgressView for immediate visual transition to the next queued item
+- Reset isDownloading flag and update UI smoothly when queue becomes empty
+- Prevent frozen "Download was cancelled" state on Windows desktop
