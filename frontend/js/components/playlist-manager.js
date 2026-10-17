@@ -83,9 +83,8 @@ export function renderPlaylist(info) {
   const isBatch = (info.platform === "batch");
   if (mediaBadge) {
     mediaBadge.textContent = isBatch ? "BATCH" : "PLAYLIST";
-    mediaBadge.style.color = isBatch ? "#a855f7" : "#7928ca";
-    mediaBadge.style.borderColor = isBatch ? "rgba(168, 85, 247, 0.4)" : "rgba(121, 40, 202, 0.4)";
-    mediaBadge.style.background = isBatch ? "rgba(168, 85, 247, 0.15)" : "rgba(121, 40, 202, 0.15)";
+    mediaBadge.className = `badge-tag media-tag media-${isBatch ? "batch" : "playlist"}`;
+    mediaBadge.removeAttribute("style");
   }
   if (mediaDuration) {
     mediaDuration.textContent = `${info.item_count} Items`;
@@ -110,11 +109,11 @@ export function renderPlaylist(info) {
     const sizeStr = bytes > 0 ? `~${formatBytes(bytes)}` : (item.filesize_formatted || "");
     const sizeTag = sizeStr ? `<span class="playlist-item-size">${sizeStr}</span>` : "";
     row.innerHTML = `
-      <input type="checkbox" class="playlist-checkbox" value="${item.id}" checked>
+      <input type="checkbox" class="playlist-checkbox" value="${escapeHtml(item.id)}" checked>
       <span class="playlist-item-title">${index + 1}. ${escapeHtml(item.title)}</span>
       <div class="playlist-item-meta">
         ${sizeTag}
-        <span class="playlist-item-duration">${item.duration_string || ""}</span>
+        <span class="playlist-item-duration">${escapeHtml(item.duration_string || "")}</span>
       </div>
     `;
     fragment.appendChild(row);
@@ -132,9 +131,8 @@ export function hidePlaylist() {
   const currentMedia = store.get("currentMedia");
   if (mediaBadge) {
     mediaBadge.textContent = "VIDEO";
-    mediaBadge.style.color = "var(--accent-cyan)";
-    mediaBadge.style.borderColor = "rgba(0, 242, 254, 0.25)";
-    mediaBadge.style.background = "rgba(0, 242, 254, 0.1)";
+    mediaBadge.className = "badge-tag media-tag media-video";
+    mediaBadge.removeAttribute("style");
   }
   if (mediaDuration) {
     const single = currentMedia && currentMedia.items && currentMedia.items[0];

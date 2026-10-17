@@ -3,18 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniDownloader - Universal Video &amp; Playlist Downloader</title>
-  <meta name="description" content="Fast, local-first media downloader for YouTube, Instagram, TikTok, X (Twitter), Bilibili, and more with real-time SSE progress.">
-  <meta property="og:title" content="OmniDownloader - Universal Video &amp; Playlist Downloader">
-  <meta property="og:description" content="Fast, local-first media downloader for YouTube, Instagram, TikTok, X (Twitter), Bilibili, and more with real-time SSE progress.">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="OmniDownloader - Universal Video &amp; Playlist Downloader">
-  <meta name="twitter:description" content="Fast, local-first media downloader for YouTube, Instagram, TikTok, X (Twitter), Bilibili, and more with real-time SSE progress.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300d2ff' stroke-width='2'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/></svg>">
+  <title>OmniDownloader - Universal Media Downloader</title>
+  <meta name="description" content="Fast, local-first media downloader for YouTube, Instagram, TikTok, X (Twitter), Bilibili, and 1,000+ sites with real-time SSE progress.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -23,7 +17,7 @@
     <header class="app-header">
       <div class="brand-cluster">
         <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -31,49 +25,50 @@
         </div>
         <div class="brand-text">
           <span class="brand-name">OmniDownloader</span>
-          <span class="app-version-pill" id="app-version-indicator" title="OmniDownloader Application Version">v1.4.9</span>
-          <span class="engine-pill" id="engine-version-indicator" title="Local yt-dlp extraction engine">
-            <span id="engine-badge-text">Engine v2026.08.19</span>
+          <span class="app-version-pill" id="app-version-indicator" title="OmniDownloader Version">v1.4.9</span>
+          <span class="engine-pill" id="engine-version-indicator" title="yt-dlp Extraction Engine">
+            <span class="engine-dot" aria-hidden="true"></span>
+            <span id="engine-badge-text">Engine Ready</span>
           </span>
         </div>
       </div>
 
       <div class="header-utilities">
-        <a href="https://github.com/Aniketkumar-01/omni_downloader" target="_blank" rel="noopener noreferrer" class="utility-btn btn-github" id="btn-github-repo" title="View Source & Stars on GitHub">
-          <svg class="github-btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <a href="https://github.com/Aniketkumar-01/omni_downloader" target="_blank" rel="noopener noreferrer" class="utility-btn" id="btn-github-repo" title="View GitHub Repository" aria-label="GitHub">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
-          <span>GitHub</span>
+          <span class="utility-label">GitHub</span>
         </a>
 
-        <button type="button" id="btn-check-updates" class="utility-btn btn-update-check" title="Check for application updates">
-          <svg class="update-btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <button type="button" id="btn-check-updates" class="utility-btn" title="Check for Updates">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
           </svg>
-          <span id="update-btn-label">Check for Updates</span>
-          <span id="update-badge-dot" class="update-badge-dot" style="display: none;" title="New version available"></span>
+          <span id="update-btn-label">Updates</span>
+          <span id="update-badge-dot" class="update-badge-dot" style="display: none;" title="New update available"></span>
         </button>
 
-        <div class="server-node" id="server-status-indicator" title="Connected to local FastAPI backend">
+        <div class="server-node" id="server-status-indicator" title="Local Backend Status">
           <span class="pulse-dot"></span>
-          <span class="node-label">Connecting...</span>
+          <span class="node-label">Connected</span>
         </div>
       </div>
     </header>
 
     <main class="console-hub">
-      <!-- Categorized Layman Error Alert Card -->
+      <!-- Error Alert Card -->
       <div id="error-alert" class="alert-banner" role="alert" style="display: none;">
         <div class="alert-header-row">
           <div class="alert-source-cluster">
             <span id="error-source-badge" class="error-source-badge source-platform">
-              <span class="source-icon" id="error-source-icon">📺</span>
-              <span class="source-text" id="error-source-text">Platform / YouTube Issue</span>
+              <span class="source-icon" id="error-source-icon"></span>
+              <span class="source-text" id="error-source-text">Notice</span>
             </span>
-            <span class="error-code-chip" id="error-code-chip" style="display: none;">BOT_CHECK</span>
+            <span class="error-code-chip" id="error-code-chip" style="display: none;"></span>
           </div>
-          <button type="button" id="btn-dismiss-error" class="btn-alert-dismiss" title="Dismiss notice" aria-label="Dismiss">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <button type="button" id="btn-dismiss-error" class="btn-alert-dismiss" title="Dismiss" aria-label="Dismiss">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -83,34 +78,33 @@
         <div class="alert-main-content">
           <div class="alert-explanation">
             <h4 id="error-title" class="error-title">Unable to process video</h4>
-            <p id="error-message" class="error-message">Error message</p>
+            <p id="error-message" class="error-message">Error description</p>
           </div>
 
           <div id="error-hint-box" class="error-hint-box" style="display: none;">
             <div class="hint-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-              <span>How to resolve:</span>
+              <span>Suggested solution:</span>
             </div>
             <p id="error-hint-text" class="hint-text"></p>
             <div id="error-action-row" class="error-action-row" style="display: none;">
-              <button type="button" id="btn-update-engine" class="btn-error-action" title="Download and install the latest extraction engine automatically">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" id="btn-update-engine" class="btn-error-action" title="Update yt-dlp core engine">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
                 </svg>
-                <span id="btn-update-engine-text">Update Download Engine Now</span>
-                <div id="engine-update-spinner" class="fetch-spinner" style="display: none; width: 14px; height: 14px; margin-left: 6px;"></div>
+                <span id="btn-update-engine-text">Update Engine Now</span>
+                <div id="engine-update-spinner" class="fetch-spinner" style="display: none; width: 12px; height: 12px; margin-left: 6px;"></div>
               </button>
             </div>
           </div>
 
-
-          <!-- Collapsible technical details for diagnostics/logging -->
+          <!-- Collapsible technical details -->
           <details id="error-tech-details" class="error-tech-details" style="display: none;">
-            <summary class="tech-details-summary">Show technical details (for debugging)</summary>
+            <summary class="tech-details-summary">Show technical details</summary>
             <pre id="error-raw-text" class="tech-details-content"></pre>
           </details>
         </div>
@@ -119,39 +113,35 @@
       <!-- Prerequisites & FFmpeg Advisory Banner -->
       <section id="prerequisites-banner" class="prereq-banner" role="status" style="display: none;">
         <div class="prereq-content">
-          <div class="prereq-triangle-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          <div class="prereq-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
           </div>
           <div class="prereq-info">
             <div class="prereq-title-row">
-              <span class="prereq-title">Prerequisites Required: FFmpeg Setup</span>
+              <span class="prereq-title">FFmpeg is recommended</span>
               <span class="prereq-badge">1080p / 4K / MP3</span>
             </div>
             <p id="prereq-desc" class="prereq-desc">
-              High-resolution video stream merging and MP3 conversion require FFmpeg. Choose an installation option below:
+              High-resolution video merging and audio conversion require FFmpeg on your system.
             </p>
           </div>
         </div>
 
         <div class="prereq-actions">
-          <button type="button" id="btn-install-ffmpeg" class="btn-prereq-action btn-prereq-primary" title="Automated 1-click download & installation of FFmpeg">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" id="btn-install-ffmpeg" class="btn-prereq-action btn-prereq-primary" title="Automated 1-click install">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="8 17 12 21 16 17"></polyline>
               <line x1="12" y1="12" x2="12" y2="21"></line>
               <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path>
             </svg>
-            <span id="btn-install-ffmpeg-text">1-Click Install FFmpeg</span>
+            <span id="btn-install-ffmpeg-text">1-Click Install</span>
           </button>
 
-          <button type="button" id="btn-copy-winget" class="btn-prereq-action btn-prereq-chip" title="Click to copy terminal command to clipboard">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="4 17 10 11 4 5"></polyline>
-              <line x1="12" y1="19" x2="20" y2="19"></line>
-            </svg>
+          <button type="button" id="btn-copy-winget" class="btn-prereq-action btn-prereq-chip" title="Copy winget command">
             <span class="prereq-cmd-text">winget install Gyan.FFmpeg</span>
             <svg class="prereq-copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -159,8 +149,8 @@
             </svg>
           </button>
 
-          <button type="button" id="btn-dismiss-prereq" class="btn-prereq-close" title="Dismiss notice">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" id="btn-dismiss-prereq" class="btn-prereq-close" title="Dismiss" aria-label="Dismiss">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -168,12 +158,12 @@
         </div>
       </section>
 
-      <!-- Command Deck: Primary Input Area -->
+      <!-- Primary Command Deck: Omnibar -->
       <section class="command-deck" aria-label="Media Ingestion">
         <form id="url-form" class="ingest-form" onsubmit="event.preventDefault(); return false;">
           <div class="input-bay">
             <div class="input-prefix-icon" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
@@ -183,7 +173,7 @@
               type="text" 
               id="url-input" 
               class="console-input" 
-              placeholder="Paste media or playlist URL (YouTube, Instagram, TikTok, X, Bilibili...)" 
+              placeholder="Paste a video, reel, or playlist URL..." 
               autocomplete="off" 
               spellcheck="false"
             >
@@ -191,83 +181,63 @@
             <textarea 
               id="batch-input" 
               class="batch-textarea" 
-              placeholder="Paste multiple media URLs (one per line, space, or comma separated)..." 
+              placeholder="Paste multiple URLs (one per line)..." 
               autocomplete="off" 
               spellcheck="false" 
               rows="3" 
               style="display: none;"
             ></textarea>
 
-            <button type="button" id="btn-clear" class="btn-input-action btn-clear" title="Clear input (Esc)" style="display: none;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+            <div class="input-actions-cluster">
+              <button type="button" id="btn-clear" class="btn-icon-subtle" title="Clear input (Esc)" style="display: none;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
 
-            <button type="button" id="btn-batch-toggle" class="btn-batch-toggle" title="Toggle Batch Mode for multiple URLs">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6"></line>
-                <line x1="8" y1="12" x2="21" y2="12"></line>
-                <line x1="8" y1="18" x2="21" y2="18"></line>
-                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-              </svg>
-              <span id="batch-toggle-label">Batch</span>
-            </button>
+              <button type="button" id="btn-batch-toggle" class="btn-pill-toggle" title="Toggle Batch Mode for multiple URLs">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                <span id="batch-toggle-label">Batch</span>
+              </button>
 
-            <button type="button" id="btn-paste" class="btn-paste-dock" title="Paste from clipboard">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              </svg>
-              <span>Paste</span>
-            </button>
+              <button type="button" id="btn-paste" class="btn-pill-toggle" title="Paste from clipboard">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                <span>Paste</span>
+              </button>
 
-            <button type="button" id="btn-submit" class="btn-fetch-trigger">
-              <span id="btn-submit-text">Fetch Info</span>
-              <div id="btn-spinner" class="fetch-spinner" style="display: none;"></div>
-            </button>
+              <button type="button" id="btn-submit" class="btn-primary-action">
+                <span id="btn-submit-text">Fetch Info</span>
+                <div id="btn-spinner" class="fetch-spinner" style="display: none;"></div>
+              </button>
+            </div>
           </div>
 
-          <!-- Platform Detection Rail & Network Note -->
+          <!-- Platform Strip & Local Status -->
           <div class="deck-footer-row">
             <div class="platform-strip" id="platform-strip">
               <span class="platform-pill" data-platform="youtube">YouTube</span>
               <span class="platform-pill" data-platform="instagram">Instagram</span>
               <span class="platform-pill" data-platform="tiktok">TikTok</span>
-              <span class="platform-pill" data-platform="twitter">X / Twitter</span>
+              <span class="platform-pill" data-platform="twitter">X</span>
               <span class="platform-pill" data-platform="bilibili">Bilibili</span>
               <span class="platform-pill" data-platform="facebook">Facebook</span>
               <span class="platform-pill" data-platform="reddit">Reddit</span>
             </div>
 
-            <div class="network-hint" title="Regional connection advisory">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <span>VPN needed for restricted platforms</span>
+            <div class="deck-status-hint">
+              <span>Local processing • Zero cloud telemetry</span>
             </div>
-          </div>
-
-          <!-- 100% Local PC Privacy Strip -->
-          <div class="deck-sub-row deck-sub-row-privacy">
-            <div class="local-privacy-badge" title="OmniDownloader executes 100% locally on your computer. Your sessions and downloads never leave your PC.">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-              <span>OmniDownloader v1.3.5 • 100% Local PC Processing • Zero Cloud Telemetry</span>
-            </div>
-            <a href="https://github.com/Aniketkumar-01/omni_downloader" target="_blank" rel="noopener noreferrer" class="footer-github-link" title="Open GitHub Repository">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-              <span>GitHub</span>
-            </a>
           </div>
         </form>
       </section>
@@ -284,14 +254,14 @@
 
           <div class="stage-dossier">
             <div class="dossier-meta">
-              <span id="platform-badge" class="badge-tag platform-tag">YouTube</span>
-              <span id="media-badge" class="badge-tag media-tag">Video</span>
+              <span id="platform-badge" class="badge-tag platform-tag">YOUTUBE</span>
+              <span id="media-badge" class="badge-tag media-tag">VIDEO</span>
             </div>
 
             <h2 id="media-title" class="media-headline">Title placeholder</h2>
 
             <div class="creator-stamp">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
@@ -300,42 +270,44 @@
 
             <!-- Controls row: quality selector and download action -->
             <div class="dispatch-panel">
-              <div class="quality-dock">
-                <div class="dock-label-row">
-                  <label for="quality-select" class="dock-label">Quality / Stream:</label>
-                  <span id="quality-size-badge" class="quality-size-badge" style="display: none;">Est: --</span>
+              <div class="dispatch-inputs-row">
+                <div class="quality-dock">
+                  <div class="dock-label-row">
+                    <label for="quality-select" class="dock-label">Quality</label>
+                    <span id="quality-size-badge" class="quality-size-badge" style="display: none;">--</span>
+                  </div>
+                  <div class="select-wrapper">
+                    <select id="quality-select" class="console-select">
+                      <option value="best" selected>Best Quality (MP4)</option>
+                      <option value="1080p">Full HD 1080p (MP4)</option>
+                      <option value="720p">HD 720p (MP4)</option>
+                      <option value="480p">SD 480p (MP4)</option>
+                      <option value="audio_mp3">Audio Only (MP3)</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="select-wrapper">
-                  <select id="quality-select" class="console-select">
-                    <option value="best" selected>Best Quality (MP4)</option>
-                    <option value="1080p">Full HD 1080p (MP4)</option>
-                    <option value="720p">HD 720p (MP4)</option>
-                    <option value="480p">SD 480p (MP4)</option>
-                    <option value="audio_mp3">Audio Only (MP3)</option>
-                  </select>
-                </div>
-              </div>
 
-              <div class="folder-dock">
-                <label for="folder-path-input" class="dock-label">Save Location:</label>
-                <div class="folder-input-wrapper">
-                  <input type="text" id="folder-path-input" class="folder-path-input" placeholder="Downloads folder..." title="Type/paste path or click Browse to choose folder">
-                  <button type="button" id="btn-browse-folder" class="btn-browse-folder" title="Browse / Change destination folder">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    <span>Browse</span>
-                  </button>
+                <div class="folder-dock">
+                  <label for="folder-path-input" class="dock-label">Destination</label>
+                  <div class="folder-input-wrapper">
+                    <input type="text" id="folder-path-input" class="folder-path-input" placeholder="Save directory..." title="Download save folder">
+                    <button type="button" id="btn-browse-folder" class="btn-browse-folder" title="Browse folder">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                      <span>Browse</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <button type="button" id="btn-download" class="btn-execute-download">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
                   <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                <span id="btn-download-text">Download Now</span>
+                <span id="btn-download-text">Download Video</span>
               </button>
             </div>
           </div>
@@ -344,7 +316,7 @@
         <!-- Playlist Item Selector -->
         <div id="playlist-section" class="playlist-tray" style="display: none;">
           <div class="playlist-tray-header">
-            <span id="playlist-count" class="tray-title">Playlist Items (0 videos)</span>
+            <span id="playlist-count" class="tray-title">Playlist Items (0)</span>
             <button type="button" id="btn-toggle-playlist" class="btn-tray-toggle">Select All</button>
           </div>
           <div id="playlist-items-list" class="playlist-scroll-list">
@@ -357,15 +329,11 @@
       <section id="progress-card" class="telemetry-bay" aria-label="Download Telemetry" style="display: none;">
         <div class="telemetry-header">
           <div class="stream-info">
-            <div class="stream-pulse-icon" aria-hidden="true">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-              </svg>
-            </div>
+            <div class="stream-dot" aria-hidden="true"></div>
             <div id="progress-item-title" class="telemetry-stream-name">Initializing download...</div>
           </div>
           <div class="telemetry-header-right">
-            <button type="button" id="btn-pause-download" class="btn-pause-download" title="Pause download" style="display: none;">
+            <button type="button" id="btn-pause-download" class="btn-telemetry-action" title="Pause download" style="display: none;">
               <svg id="icon-pause" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="6" y="4" width="4" height="16" rx="1"></rect>
                 <rect x="14" y="4" width="4" height="16" rx="1"></rect>
@@ -375,8 +343,8 @@
               </svg>
               <span id="btn-pause-text">Pause</span>
             </button>
-            <button type="button" id="btn-cancel-download" class="btn-cancel-download" title="Cancel this download" style="display: none;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <button type="button" id="btn-cancel-download" class="btn-telemetry-action btn-telemetry-cancel" title="Cancel download" style="display: none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -392,115 +360,87 @@
 
         <div class="telemetry-readout">
           <div class="readout-stat">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            <span id="progress-speed">Speed: Calculating...</span>
+            <span class="stat-label">Speed</span>
+            <span id="progress-speed" class="stat-value">Calculating...</span>
           </div>
 
           <div class="readout-stat">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span id="progress-eta">ETA: --</span>
+            <span class="stat-label">ETA</span>
+            <span id="progress-eta" class="stat-value">--</span>
           </div>
 
           <div class="readout-stat" id="readout-size-stat">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-              <line x1="12" y1="22.08" x2="12" y2="12"></line>
-            </svg>
-            <span id="progress-size">Size: --</span>
+            <span class="stat-label">Size</span>
+            <span id="progress-size" class="stat-value">--</span>
           </div>
         </div>
 
         <div id="progress-actions" class="destination-actions" style="display: none;">
-          <button type="button" id="btn-open-folder" class="btn-dest btn-dest-primary" title="Open the download folder and reveal the saved video">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" id="btn-open-folder" class="btn-dest btn-dest-primary" title="Reveal saved file in File Explorer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
             </svg>
             <span>Show in Folder</span>
           </button>
 
-          <button type="button" id="btn-play-file" class="btn-dest btn-dest-secondary">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" id="btn-play-file" class="btn-dest btn-dest-secondary" title="Open and play file">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
-            <span>Open / Play File</span>
+            <span>Play File</span>
           </button>
 
-          <button type="button" id="btn-download-again" class="btn-dest btn-dest-ghost" title="Re-download this video">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" id="btn-download-again" class="btn-dest btn-dest-ghost" title="Download another video">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="23 4 23 10 17 10"></polyline>
               <polyline points="1 20 1 14 7 14"></polyline>
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
-            <span>Download Again</span>
+            <span>New Download</span>
           </button>
         </div>
       </section>
     </main>
 
-    <!-- Micro-Notification Container -->
+    <!-- Notification Toast Hub -->
     <div id="toast-container" class="toast-hub" aria-live="polite"></div>
   </div>
 
-  <!-- System Command Permission & Choice Modal -->
+  <!-- FFmpeg System Command Permission Modal -->
   <div id="cmd-permission-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cmd-modal-title">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-icon-badge" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="4 17 10 11 4 5"></polyline>
-            <line x1="12" y1="19" x2="20" y2="19"></line>
-          </svg>
-        </div>
         <div class="modal-header-text">
-          <h3 id="cmd-modal-title" class="modal-title">System Setup Permission</h3>
-          <p class="modal-subtitle">OmniDownloader runs 100% on your PC without external websites</p>
+          <h3 id="cmd-modal-title" class="modal-title">FFmpeg Setup</h3>
+          <p class="modal-subtitle">Required for stream merging and high-resolution downloads</p>
         </div>
-        <button type="button" id="btn-close-cmd-modal" class="btn-modal-close" aria-label="Close modal">&times;</button>
+        <button type="button" id="btn-close-cmd-modal" class="btn-modal-close" aria-label="Close dialog">&times;</button>
       </div>
 
       <div class="modal-body">
-        <div class="modal-callout">
-          <strong>Why is this setup needed?</strong>
-          <p>High-resolution video streams (1080p, 4K) and MP3 audio are processed locally on your PC using FFmpeg. FFmpeg merges video and audio streams into single, high-quality playable MP4 files.</p>
-        </div>
+        <p class="modal-notice">
+          High-resolution 1080p, 4K videos and MP3 audio are merged locally on your PC using FFmpeg. You can let OmniDownloader install it via winget, or run the command yourself:
+        </p>
 
         <div class="modal-command-box">
-          <span class="cmd-label">Terminal command to be executed:</span>
+          <span class="cmd-label">Terminal command:</span>
           <div class="cmd-snippet-row">
             <code id="cmd-to-run">winget install Gyan.FFmpeg</code>
-            <button type="button" id="btn-modal-copy-cmd" class="btn-chip-copy" title="Copy command to clipboard">
+            <button type="button" id="btn-modal-copy-cmd" class="btn-chip-copy" title="Copy command">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               <span>Copy</span>
             </button>
           </div>
         </div>
-
-        <p class="modal-notice">
-          We never execute terminal commands or open browser websites without your permission. You can choose to let the app install FFmpeg in the background, or do it yourself in your own terminal.
-        </p>
       </div>
 
       <div class="modal-footer">
-        <button type="button" id="btn-diy-cmd" class="btn-modal-secondary" title="Copy command and run it yourself">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="4 17 10 11 4 5"></polyline>
-            <line x1="12" y1="19" x2="20" y2="19"></line>
-          </svg>
+        <button type="button" id="btn-diy-cmd" class="btn-modal-secondary">
           <span>I'll Do It Myself</span>
         </button>
 
         <button type="button" id="btn-grant-permission-cmd" class="btn-modal-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span id="btn-grant-permission-text">Grant Permission &amp; Install</span>
+          <span id="btn-grant-permission-text">Install FFmpeg Automatically</span>
         </button>
       </div>
     </div>
@@ -510,46 +450,37 @@
   <div id="app-update-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="update-modal-title">
     <div class="modal-card update-modal-card">
       <div class="modal-header">
-        <div class="modal-icon-badge update-icon-badge" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="8 17 12 21 16 17"></polyline>
-            <line x1="12" y1="12" x2="12" y2="21"></line>
-            <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path>
-          </svg>
-        </div>
         <div class="modal-header-text">
-          <h3 id="update-modal-title" class="modal-title">Application Update Available</h3>
-          <p id="update-modal-subtitle" class="modal-subtitle">A newer version of OmniDownloader is ready to install</p>
+          <h3 id="update-modal-title" class="modal-title">Application Update</h3>
+          <p id="update-modal-subtitle" class="modal-subtitle">A newer version of OmniDownloader is available</p>
         </div>
-        <button type="button" id="btn-close-update-modal" class="btn-modal-close" aria-label="Close update modal">&times;</button>
+        <button type="button" id="btn-close-update-modal" class="btn-modal-close" aria-label="Close dialog">&times;</button>
       </div>
 
       <div class="modal-body update-modal-body">
         <!-- Version leap row -->
         <div class="version-leap-row">
           <div class="version-badge-box">
-            <span class="version-box-label">Current Version</span>
-            <span id="update-current-version" class="version-number current">v1.2.4</span>
+            <span class="version-box-label">Installed</span>
+            <span id="update-current-version" class="version-number current">v1.4.9</span>
           </div>
-          <div class="version-arrow-col" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <div class="version-arrow" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </div>
           <div class="version-badge-box target">
-            <span class="version-box-label">New Release</span>
-            <span id="update-target-version" class="version-number target">v1.2.5</span>
+            <span class="version-box-label">Available</span>
+            <span id="update-target-version" class="version-number target">v1.5.0</span>
           </div>
         </div>
 
         <div class="update-meta-row">
           <span id="update-meta-date" class="meta-item">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             <span id="update-date-text">Published: Recent</span>
           </span>
           <span id="update-meta-size" class="meta-item">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             <span id="update-size-text">Size: ~48 MB</span>
           </span>
         </div>
@@ -557,14 +488,14 @@
         <!-- Release Notes Section -->
         <div class="release-notes-wrapper">
           <div class="notes-header">
-            <span>What's New in This Release:</span>
+            <span>Release Notes</span>
           </div>
           <div id="update-notes-content" class="release-notes-content">
             <!-- Dynamic release highlights -->
           </div>
         </div>
 
-        <!-- In-Modal Download Progress Deck (initially hidden) -->
+        <!-- In-Modal Download Progress Deck -->
         <div id="update-download-deck" class="update-download-deck" style="display: none;">
           <div class="update-download-header">
             <span id="update-download-status-label" class="download-status-text">Downloading update package...</span>
@@ -581,13 +512,12 @@
       </div>
 
       <div class="modal-footer">
-        <a id="btn-update-github-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-modal-secondary" title="Open GitHub release page in browser">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-          <span>View on GitHub</span>
+        <a id="btn-update-github-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-modal-secondary" title="View release on GitHub">
+          <span>GitHub Release</span>
         </a>
 
         <button type="button" id="btn-update-cancel" class="btn-modal-secondary" style="display: none;">
-          Cancel Download
+          Cancel
         </button>
 
         <button type="button" id="btn-update-later" class="btn-modal-secondary">
@@ -595,12 +525,7 @@
         </button>
 
         <button type="button" id="btn-update-action" class="btn-modal-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="8 17 12 21 16 17"></polyline>
-            <line x1="12" y1="12" x2="12" y2="21"></line>
-            <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path>
-          </svg>
-          <span id="btn-update-action-text">Download &amp; Install</span>
+          <span id="btn-update-action-text">Update Now</span>
         </button>
       </div>
     </div>

@@ -33,6 +33,10 @@ jobs:
           pip install -r backend/requirements.txt
           pip install pyinstaller pillow
 
+      - name: Run Backend Test Suite
+        run: |
+          pytest backend/tests/ -v --maxfail=1
+
       - name: Install Inno Setup
         shell: pwsh
         run: |
@@ -142,9 +146,12 @@ jobs:
         run: |
           mkdir -p dist-release
           if [ ! -f "dist-release/OmniDownloader-Setup.exe" ]; then
-            echo "Fetching latest Windows release binaries from v1.4.0 to include in release assets..."
-            curl -L -f -s -o dist-release/OmniDownloader-Setup.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe" || true
-            curl -L -f -s -o dist-release/OmniDownloader.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader.exe" || true
+            TAG="${{ github.ref_name || 'latest' }}"
+            echo "Fetching Windows release binaries from tag $TAG..."
+            curl -L -f -s -o dist-release/OmniDownloader-Setup.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/download/$TAG/OmniDownloader-Setup.exe" || \
+            curl -L -f -s -o dist-release/OmniDownloader-Setup.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/latest/download/OmniDownloader-Setup.exe" || true
+            curl -L -f -s -o dist-release/OmniDownloader.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/download/$TAG/OmniDownloader.exe" || \
+            curl -L -f -s -o dist-release/OmniDownloader.exe "https://github.com/Aniketkumar-01/omni_downloader/releases/latest/download/OmniDownloader.exe" || true
           fi
           ls -la dist-release/
 
@@ -172,8 +179,8 @@ jobs:
             ### 🪟 Windows Desktop Downloads
             | File | Type | Download Link | Description |
             | :--- | :--- | :--- | :--- |
-            | **`OmniDownloader-Setup.exe`** | **Installer (Recommended)** | [⬇️ Download Installer](https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader-Setup.exe) | 1-Click setup wizard. Adds Start Menu & Windows Search integration, desktop shortcut, and clean uninstall. |
-            | **`OmniDownloader.exe`** | **Portable Standalone** | [⬇️ Download Portable EXE](https://github.com/Aniketkumar-01/omni_downloader/releases/download/v1.4.0/OmniDownloader.exe) | Single binary executable. No installation required; run directly from any folder or USB. |
+            | **`OmniDownloader-Setup.exe`** | **Installer (Recommended)** | [⬇️ Download Installer](https://github.com/Aniketkumar-01/omni_downloader/releases/latest/download/OmniDownloader-Setup.exe) | 1-Click setup wizard. Adds Start Menu & Windows Search integration, desktop shortcut, and clean uninstall. |
+            | **`OmniDownloader.exe`** | **Portable Standalone** | [⬇️ Download Portable EXE](https://github.com/Aniketkumar-01/omni_downloader/releases/latest/download/OmniDownloader.exe) | Single binary executable. No installation required; run directly from any folder or USB. |
 
             ---
 

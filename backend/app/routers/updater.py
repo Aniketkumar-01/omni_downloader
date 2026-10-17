@@ -159,6 +159,15 @@ async def check_app_update(force: bool = False):
 @router.post("/app/update/download")
 async def start_app_update_download(req: UpdateDownloadRequest):
     """Initiates streaming download of update installer in background."""
+    from urllib.parse import urlparse
+    parsed = urlparse(req.download_url)
+    allowed_hosts = ("github.com", "objects.githubusercontent.com", "api.github.com")
+    if parsed.scheme.lower() != "https" or parsed.netloc.lower() not in allowed_hosts:
+        raise HTTPException(
+            status_code=400,
+            detail="Update URL must be an authorized HTTPS GitHub release URL."
+        )
+
     result = await asyncio.to_thread(
         updater.start_download,
         download_url=req.download_url,

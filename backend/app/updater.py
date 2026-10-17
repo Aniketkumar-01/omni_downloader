@@ -221,6 +221,16 @@ class AppUpdater:
 
     def _download_worker(self, download_url: str, expected_size: int, version_tag: str):
         """Worker thread executing streaming chunked download."""
+        from urllib.parse import urlparse
+        parsed = urlparse(download_url)
+        allowed_hosts = ("github.com", "objects.githubusercontent.com", "api.github.com")
+        if parsed.scheme.lower() != "https" or parsed.netloc.lower() not in allowed_hosts:
+            logger.error(f"Rejected update download from untrusted host: {parsed.netloc}")
+            with self.lock:
+                self.state["status"] = "failed"
+                self.state["error"] = f"Untrusted update source host: {parsed.netloc}"
+            return
+
         clean_tag = re.sub(r'[^a-zA-Z0-9._-]', '', version_tag) or "latest"
         target_file = UPDATES_DIR / f"OmniDownloader-Setup-{clean_tag}.exe"
         part_file = UPDATES_DIR / f"OmniDownloader-Setup-{clean_tag}.exe.part"

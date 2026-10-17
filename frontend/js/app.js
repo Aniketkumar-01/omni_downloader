@@ -47,7 +47,6 @@ const btnSubmit = document.getElementById("btn-submit");
 const btnSubmitText = document.getElementById("btn-submit-text");
 const btnSpinner = document.getElementById("btn-spinner");
 const platformPills = document.querySelectorAll(".platform-pill");
-const cookieSelect = document.getElementById("cookie-select");
 const qualitySelect = document.getElementById("quality-select");
 const folderPathInput = document.getElementById("folder-path-input");
 const btnDownload = document.getElementById("btn-download");
@@ -165,15 +164,14 @@ async function handleUrlSubmission(e) {
   hideProgressView();
 
   try {
-    const cookieBrowser = cookieSelect ? cookieSelect.value : null;
     let info;
     if (extracted.length > 1) {
-      info = await fetchBatchMediaInfo(extracted, cookieBrowser);
+      info = await fetchBatchMediaInfo(extracted);
     } else {
       const singleUrl = extracted[0];
       if (urlInput) urlInput.value = singleUrl;
       updatePlatformHighlights(singleUrl);
-      info = await fetchMediaInfo(singleUrl, cookieBrowser);
+      info = await fetchMediaInfo(singleUrl);
     }
     store.set("currentMedia", info);
     renderMediaInfo(info);
@@ -208,7 +206,6 @@ async function executeDownload() {
   setDownloadButtonState("downloading", "Starting download...");
 
   try {
-    const cookieBrowser = cookieSelect ? cookieSelect.value : null;
     let downloadDir = folderPathInput ? folderPathInput.value.trim() : null;
     if (downloadDir) {
       downloadDir = downloadDir.replace(/^["']+|["']+$/g, '').trim();
@@ -221,7 +218,6 @@ async function executeDownload() {
       batchItems: (currentMedia.platform === "batch") ? currentMedia.items : null,
       playlistTitle: currentMedia.title,
       quality,
-      cookieBrowser,
       downloadDir: downloadDir || null,
     });
 

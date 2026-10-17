@@ -141,27 +141,8 @@ export function renderMediaInfo(info) {
   if (platformBadge) {
     const platformName = (info.platform || "universal").toUpperCase();
     platformBadge.textContent = platformName;
-    if (platformName === "YOUTUBE") {
-      platformBadge.style.color = "#ff4b4b";
-      platformBadge.style.borderColor = "rgba(255, 75, 75, 0.3)";
-      platformBadge.style.background = "rgba(255, 75, 75, 0.1)";
-    } else if (platformName === "INSTAGRAM") {
-      platformBadge.style.color = "#e1306c";
-      platformBadge.style.borderColor = "rgba(225, 48, 108, 0.3)";
-      platformBadge.style.background = "rgba(225, 48, 108, 0.1)";
-    } else if (platformName === "TIKTOK") {
-      platformBadge.style.color = "#00f2fe";
-      platformBadge.style.borderColor = "rgba(0, 242, 254, 0.3)";
-      platformBadge.style.background = "rgba(0, 242, 254, 0.1)";
-    } else if (platformName === "BATCH") {
-      platformBadge.style.color = "#a855f7";
-      platformBadge.style.borderColor = "rgba(168, 85, 247, 0.4)";
-      platformBadge.style.background = "rgba(168, 85, 247, 0.12)";
-    } else {
-      platformBadge.style.color = "var(--accent-blue)";
-      platformBadge.style.borderColor = "rgba(79, 172, 254, 0.3)";
-      platformBadge.style.background = "rgba(79, 172, 254, 0.1)";
-    }
+    platformBadge.className = `badge-tag platform-tag platform-${(info.platform || "universal").toLowerCase()}`;
+    platformBadge.removeAttribute("style");
   }
 
   // Populate quality options

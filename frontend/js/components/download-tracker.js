@@ -56,7 +56,7 @@ export function showProgressView(taskId) {
   if (progressPercentage) progressPercentage.textContent = "0%";
   if (progressBarFill) {
     progressBarFill.style.width = "0%";
-    progressBarFill.style.background = "linear-gradient(90deg, #00d2ff, #00f0b5)";
+    progressBarFill.style.background = "var(--accent-primary)";
   }
   if (progressSpeed) progressSpeed.textContent = "Speed: Calculating...";
   if (progressEta) progressEta.textContent = "ETA: --";
@@ -109,7 +109,7 @@ export function showProgressView(taskId) {
 
       if (data.status === "paused") {
         isPaused = true;
-        if (progressBarFill) progressBarFill.style.background = "linear-gradient(90deg, #f59e0b, #fbbf24)";
+        if (progressBarFill) progressBarFill.style.background = "var(--status-warning)";
         if (progressSpeed) progressSpeed.textContent = "Speed: Paused";
         if (btnPauseDownload) {
           btnPauseDownload.classList.add("is-paused");
@@ -119,7 +119,7 @@ export function showProgressView(taskId) {
         }
       } else if (data.status === "downloading" && isPaused) {
         isPaused = false;
-        if (progressBarFill) progressBarFill.style.background = "linear-gradient(90deg, #00d2ff, #00f0b5)";
+        if (progressBarFill) progressBarFill.style.background = "var(--accent-primary)";
         if (btnPauseDownload) {
           btnPauseDownload.classList.remove("is-paused");
           if (btnPauseText) btnPauseText.textContent = "Pause";
@@ -242,7 +242,7 @@ export function initDownloadTracker(options = {}) {
         if (!isPaused) {
           await pauseTask(currentTaskId);
           isPaused = true;
-          if (progressBarFill) progressBarFill.style.background = "linear-gradient(90deg, #f59e0b, #fbbf24)";
+          if (progressBarFill) progressBarFill.style.background = "var(--status-warning)";
           if (progressSpeed) progressSpeed.textContent = "Speed: Paused";
           btnPauseDownload.classList.add("is-paused");
           if (btnPauseText) btnPauseText.textContent = "Resume";
@@ -252,7 +252,7 @@ export function initDownloadTracker(options = {}) {
         } else {
           await resumeTask(currentTaskId);
           isPaused = false;
-          if (progressBarFill) progressBarFill.style.background = "linear-gradient(90deg, #00d2ff, #00f0b5)";
+          if (progressBarFill) progressBarFill.style.background = "var(--accent-primary)";
           if (progressSpeed) progressSpeed.textContent = "Speed: Resuming...";
           btnPauseDownload.classList.remove("is-paused");
           if (btnPauseText) btnPauseText.textContent = "Pause";

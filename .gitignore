@@ -53,7 +53,9 @@ desktop.py
 push.bat
 push.ps1
 push_to_github.bat
+publish_release.bat
 release_android.bat
 update_tag.py
 .commit_msg
+preview.html
 

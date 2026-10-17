@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from pathlib import Path
 import sys
-from PyInstaller.utils.hooks import collect_submodules, collect_data_files
+from PyInstaller.utils.hooks import collect_submodules, collect_data_files, collect_all
 
 block_cipher = None
 
@@ -12,6 +12,17 @@ datas = [
     (str(root_dir / 'frontend'), 'frontend'),
     (str(root_dir / 'backend' / 'app'), 'backend/app'),
 ]
+
+# Explicitly collect all data, binaries, and submodules for pydantic and pydantic_core
+extra_binaries = []
+for pkg in ['pydantic', 'pydantic_core']:
+    try:
+        pkg_datas, pkg_binaries, pkg_hidden = collect_all(pkg)
+        datas += pkg_datas
+        extra_binaries += pkg_binaries
+        hiddenimports_p = pkg_hidden
+    except Exception:
+        hiddenimports_p = []
 
 # Collect package data files (e.g. imageio-ffmpeg binaries, yt-dlp metadata)
 try:
@@ -61,7 +72,6 @@ hiddenimports = [
     'multipart',
     'python_multipart',
     'platformdirs',
-    'requests',
     'imageio_ffmpeg',
     'colorama',
     'ctypes',
@@ -77,10 +87,9 @@ for pkg in ['uvicorn', 'fastapi', 'starlette', 'sse_starlette', 'yt_dlp', 'platf
 
 hiddenimports = sorted(list(set(hiddenimports)))
 
-# Collect VC++ runtime DLLs and Python DLLs to guarantee python311.dll loads on any Windows PC
+# Collect VC++ runtime DLLs and Python DLLs to guarantee python dlls load on any Windows PC
 py_dir = Path(sys.base_prefix)
-extra_binaries = []
-for dll_name in ['python311.dll', 'vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll', 'ucrtbase.dll']:
+for dll_name in ['python311.dll', 'python312.dll', 'python310.dll', 'vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll', 'ucrtbase.dll']:
     dll_path = py_dir / dll_name
     if dll_path.exists():
         extra_binaries.append((str(dll_path), '.'))

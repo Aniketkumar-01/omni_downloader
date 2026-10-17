@@ -65,6 +65,9 @@ app = FastAPI(
     title="OmniDownloader Web App",
     description="Hardened universal media downloader with modular routers and real-time SSE progress",
     version=APP_VERSION,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
     lifespan=lifespan
 )
 
@@ -109,7 +112,7 @@ async def security_and_auth_middleware(request: Request, call_next):
             )
 
     # 3. Require X-Auth-Token on /api/* requests (except public bootstrap endpoints)
-    public_endpoints = ("/api/token", "/api/heartbeat", "/api/shutdown", "/api/clipboard")
+    public_endpoints = ("/api/token", "/api/heartbeat")
     if request.url.path.startswith("/api/") and request.url.path not in public_endpoints:
         token = request.headers.get("x-auth-token") or request.query_params.get("token")
         if not token or not secrets.compare_digest(token, API_TOKEN):
@@ -125,6 +128,9 @@ async def security_and_auth_middleware(request: Request, call_next):
 
     record_heartbeat()
     response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     path = request.url.path
     if any(path.endswith(ext) for ext in (".css", ".js", ".svg", ".png", ".jpg", ".ico", ".woff", ".woff2")):
         response.headers["Cache-Control"] = "public, max-age=3600"
