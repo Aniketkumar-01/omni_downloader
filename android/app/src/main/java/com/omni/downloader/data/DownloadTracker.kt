@@ -43,7 +43,7 @@ object DownloadTracker {
         try {
             val obj = JSONObject(jsonStr)
             val statusStr = obj.optString("status", TaskStatus.DOWNLOADING.name)
-            val status = try { TaskStatus.valueOf(statusStr) } catch (_: Exception) { TaskStatus.DOWNLOADING }
+            val status = try { TaskStatus.valueOf(statusStr) } catch (e: Exception) { TaskStatus.DOWNLOADING }
             if (status == TaskStatus.DOWNLOADING || status == TaskStatus.PAUSED) {
                 _activeTask.value = DownloadTaskProgress(
                     taskId = obj.optString("taskId", ""),
@@ -70,7 +70,7 @@ object DownloadTracker {
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
                 val statusStr = obj.optString("status", TaskStatus.COMPLETED.name)
-                val status = try { TaskStatus.valueOf(statusStr) } catch (_: Exception) { TaskStatus.COMPLETED }
+                val status = try { TaskStatus.valueOf(statusStr) } catch (e: Exception) { TaskStatus.COMPLETED }
                 list.add(
                     DownloadTaskProgress(
                         taskId = obj.optString("taskId", ""),

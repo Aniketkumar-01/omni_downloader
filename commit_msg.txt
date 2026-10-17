@@ -1,6 +1,5 @@
-Fix(android): Resolve DownloadTaskProgress property references, Compose LinearProgressIndicator and vector drawables
+Fix(android): Replace Kotlin 2.0 unnamed catch parameter with standard catch (e: Exception)
 
-- Fix DownloadTaskProgress property access: currentTitle, progressPercent, speedFormatted
-- Fix LinearProgressIndicator progress parameter type (Float instead of lambda)
-- Replace experimental Surface(onClick) with standard Modifier.clickable in SupportedPlatformsCard
-- Standardize VectorDrawable SVG pathData syntax across all platform icons
+- Kotlin 1.9.24 does not support unnamed catch variables `catch (_: Exception)`
+- Replaced with `catch (e: Exception)` in loadActiveTask and loadHistory in DownloadTracker.kt
+- Fixes GitHub Actions Android APK build failure in run #62
